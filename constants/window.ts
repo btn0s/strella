@@ -1,0 +1,2 @@
+export const FILE_MANAGER_WINDOW_WIDTH = 900 * 0.8;
+export const FILE_MANAGER_WINDOW_HEIGHT = 670 * 0.8;

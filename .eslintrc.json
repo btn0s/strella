@@ -1,0 +1,39 @@
+{
+  "extends": [
+    "eslint:recommended",
+    "plugin:react/recommended",
+    "plugin:react/jsx-runtime",
+    "@electron-toolkit/eslint-config-ts/recommended"
+  ],
+  "plugins": ["import"],
+  "rules": {
+    "react/react-in-jsx-scope": "off",
+    "import/order": [
+      "error",
+      {
+        "groups": ["builtin", "external", "internal"],
+
+        // Always sort React imports first.
+        "pathGroups": [
+          {
+            "pattern": "react",
+            "group": "builtin",
+            "position": "before"
+          }
+        ],
+        "pathGroupsExcludedImportTypes": ["react"],
+
+        "newlines-between": "always",
+
+        // Sort within groups.
+        "alphabetize": { "order": "asc" }
+      }
+    ],
+    "import/extensions": "off",
+    "react/jsx-curly-brace-presence": [
+      "error",
+      { "props": "never", "children": "never" }
+    ],
+    "@typescript-eslint/explicit-function-return-type": "off"
+  }
+}
