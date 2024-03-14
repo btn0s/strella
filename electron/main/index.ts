@@ -55,7 +55,6 @@ app.whenReady().then(() => {
     optimizer.watchWindowShortcuts(window);
   });
 
-  // Get Screen Size
   ipcMain.on('get-screen-and-window-size', (event) => {
     const primaryDisplay = screen.getPrimaryDisplay();
     const { width: screenWidth, height: screenHeight } =
