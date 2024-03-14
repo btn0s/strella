@@ -7,7 +7,7 @@ import {
   FILE_MANAGER_WINDOW_HEIGHT,
   FILE_MANAGER_WINDOW_WIDTH,
 } from '../../constants/window';
-import icon from '../../resources/icon.png?asset';
+import icon from '@/resources/icon.png?asset';
 
 function createWindow(): void {
   // Create the browser window.

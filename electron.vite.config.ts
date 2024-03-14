@@ -9,8 +9,13 @@ export default defineConfig({
     build: {
       rollupOptions: {
         input: {
-          index: resolve(__dirname, 'electron/main/index.ts'),
+          index: resolve(__dirname, 'src/electron/main/index.ts'),
         },
+      },
+    },
+    resolve: {
+      alias: {
+        '@': resolve(__dirname, 'src'),
       },
     },
     plugins: [externalizeDepsPlugin()],
@@ -19,14 +24,19 @@ export default defineConfig({
     build: {
       rollupOptions: {
         input: {
-          index: resolve(__dirname, 'electron/preload/index.ts'),
+          index: resolve(__dirname, 'src/electron/preload/index.ts'),
         },
+      },
+    },
+    resolve: {
+      alias: {
+        '@': resolve(__dirname, 'src'),
       },
     },
     plugins: [externalizeDepsPlugin()],
   },
   renderer: {
-    root: './src',
+    root: './src/app',
     build: {
       rollupOptions: {
         input: {

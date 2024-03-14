@@ -3,7 +3,7 @@ import { ReactElement, useEffect, useState } from 'react';
 import { createLazyFileRoute } from '@tanstack/react-router';
 import { motion, animate } from 'framer-motion';
 
-import { Button } from '@/components/ui/button';
+import { Button } from '@/app/components/ui/button';
 
 const createResizeManager = () => {
   let latestWidth = window.innerWidth;
@@ -92,7 +92,7 @@ function Index(): ReactElement {
   }, [loading]);
 
   return (
-    <div className="bg-background dark flex h-svh w-svw items-center justify-center">
+    <div className="dark flex h-svh w-svw items-center justify-center bg-background">
       {/*<Component1Icon className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-white" />*/}
       <motion.div
         // fade down when loading

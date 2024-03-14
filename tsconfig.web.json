@@ -2,10 +2,10 @@
   "extends": "@electron-toolkit/tsconfig/tsconfig.web.json",
   "include": [
     "src/env.d.ts",
-    "src/**/*",
-    "src/**/*.tsx",
-    "electron/preload/*.d.ts",
-    "constants/**/*"
+    "src/app/**/*",
+    "src/app/**/*.tsx",
+    "src/constants/**/*",
+    "electron/preload/*.d.ts"
   ],
   "compilerOptions": {
     "composite": true,
