@@ -3,19 +3,19 @@ import { join } from 'path';
 import { electronApp, optimizer, is } from '@electron-toolkit/utils';
 import { app, shell, BrowserWindow, ipcMain, screen } from 'electron';
 
-import {
-  FILE_MANAGER_WINDOW_HEIGHT,
-  FILE_MANAGER_WINDOW_WIDTH,
-} from '../../constants/window';
 import icon from '@/resources/icon.png?asset';
 
 function createWindow(): void {
   // Create the browser window.
   const mainWindow = new BrowserWindow({
-    width: FILE_MANAGER_WINDOW_WIDTH,
-    height: FILE_MANAGER_WINDOW_HEIGHT,
+    width: screen.getPrimaryDisplay().workAreaSize.width - 200,
+    height: screen.getPrimaryDisplay().workAreaSize.height - 200,
     show: false,
     autoHideMenuBar: true,
+    titleBarStyle: 'hidden',
+    transparent: true,
+    center: true,
+    vibrancy: 'fullscreen-ui',
     webPreferences: {
       preload: join(__dirname, '../preload/index.js'),
       sandbox: false,
@@ -54,6 +54,11 @@ app.whenReady().then(() => {
   app.on('browser-window-created', (_, window) => {
     optimizer.watchWindowShortcuts(window);
   });
+
+  // if mac set dock icon
+  if (process.platform === 'darwin') {
+    app.dock.setIcon(icon);
+  }
 
   ipcMain.on('get-screen-and-window-size', (event) => {
     const primaryDisplay = screen.getPrimaryDisplay();

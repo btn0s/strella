@@ -49,6 +49,12 @@ export default defineConfig({
         '@': resolve(__dirname, 'src'),
       },
     },
-    plugins: [react(), TanStackRouterVite()],
+    plugins: [
+      react(),
+      TanStackRouterVite({
+        routesDirectory: './src/app/routes',
+        generatedRouteTree: './src/app/routeTree.gen.ts',
+      }),
+    ],
   },
 });

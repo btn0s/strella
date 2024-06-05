@@ -5,7 +5,7 @@
     "src/app/**/*",
     "src/app/**/*.tsx",
     "src/constants/**/*",
-    "electron/preload/*.d.ts"
+    "src/electron/preload/*.d.ts"
   ],
   "compilerOptions": {
     "composite": true,

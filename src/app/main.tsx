@@ -2,6 +2,7 @@ import { StrictMode } from 'react';
 
 import { RouterProvider, createRouter } from '@tanstack/react-router';
 import ReactDOM from 'react-dom/client';
+import '@pixi/unsafe-eval';
 
 import '@/app/global.css';
 
