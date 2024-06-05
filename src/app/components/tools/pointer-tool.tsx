@@ -13,9 +13,10 @@ const PointerTool: FC = () => {
         case 'Escape':
           deselectActiveObject(canvas);
           break;
-        case 'Delete':
+        case 'Delete': {
           deleteActiveObject(canvas);
           break;
+        }
         case 'Backspace':
           deleteActiveObject(canvas);
       }
