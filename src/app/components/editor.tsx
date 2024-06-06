@@ -16,7 +16,7 @@ import { EToolType } from '@/app/types/editor';
 
 const LeftToolbar: FC = () => {
   return (
-    <div className="pointer-events-none absolute bottom-0 left-0 top-[30px] z-10 flex w-64 flex-col gap-4 p-6">
+    <div className="pointer-events-none absolute bottom-0 left-0 top-[30px] z-10 flex w-full max-w-[350px] flex-col gap-4 p-6">
       <LayersPanel />
     </div>
   );
@@ -24,7 +24,7 @@ const LeftToolbar: FC = () => {
 
 const RightToolbar: FC = () => {
   return (
-    <div className="pointer-events-none absolute bottom-0 right-0 top-[30px] z-10 flex w-64 flex-col gap-4 p-6">
+    <div className="pointer-events-none absolute bottom-0 right-0 top-[30px] z-10 flex w-full max-w-[250px] flex-col gap-4 p-6">
       <PropertiesPanel />
     </div>
   );

@@ -1,6 +1,6 @@
 import { FC, useEffect, useRef, useState } from 'react';
 
-import { Rect } from 'fabric';
+import { LayoutManager, FixedLayout, Group } from 'fabric';
 
 import { useEditorContext } from '@/app/context/editor-context';
 import {
@@ -17,7 +17,7 @@ const FrameTool: FC = () => {
     null,
   );
 
-  const frameRef = useRef<Rect | null>(null);
+  const frameRef = useRef<Group | null>(null);
 
   useEffect(() => {
     if (!canvas) return;
@@ -30,11 +30,18 @@ const FrameTool: FC = () => {
       canvas.selection = false;
 
       const { x, y } = canvas.getScenePoint(e);
+      const target = canvas.findTarget(e);
+
+      console.log({
+        x,
+        y,
+        target,
+      });
 
       setStartPoint({ x, y });
       setIsDrawing(true);
 
-      const frame = new Rect({
+      const frame = new Group([], {
         top: y,
         left: x,
         width: 0,
@@ -44,22 +51,23 @@ const FrameTool: FC = () => {
         borderScaleFactor: 1,
         borderColor: 'rgba(255,255,255,0.2)',
         hasBorders: true,
+        interactive: true,
+        layoutManager: new LayoutManager(new FixedLayout()),
       });
 
       frameRef.current = frame;
 
+      if (target && target instanceof Group) {
+        target.add(frame);
+      }
       canvas.add(frame);
     };
 
     const handleMouseMove = (e) => {
       canvas.setCursor('crosshair');
       if (!isDrawing || !startPoint) return;
+
       const { x, y } = canvas.getScenePoint(e);
-      console.log({
-        x,
-        y,
-        startPoint,
-      });
       const width = x - startPoint.x;
       const height = y - startPoint.y;
 
@@ -79,6 +87,7 @@ const FrameTool: FC = () => {
 
       setIsDrawing(false);
       setStartPoint(null);
+      frameRef.current = null;
     };
 
     canvas.on('mouse:down', handleMouseDown);
