@@ -1,4 +1,4 @@
-import { fabric } from 'fabric';
+import { Canvas } from 'fabric';
 
 export enum EToolType {
   POINTER = 'POINTER',
@@ -28,7 +28,7 @@ export interface IProject {
 
 export interface IEditorState {
   // project: IProject;
-  canvas: fabric.Canvas | null;
+  canvas: Canvas | null;
   activeTool: string;
   setActiveTool: (tool: EToolType) => void;
 }

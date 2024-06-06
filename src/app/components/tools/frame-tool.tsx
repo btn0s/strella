@@ -1,6 +1,6 @@
 import { FC, useEffect, useRef, useState } from 'react';
 
-import { fabric } from 'fabric';
+import { Rect } from 'fabric';
 
 import { useEditorContext } from '@/app/context/editor-context';
 import {
@@ -17,7 +17,7 @@ const FrameTool: FC = () => {
     null,
   );
 
-  const frameRef = useRef<fabric.Rect | null>(null);
+  const frameRef = useRef<Rect | null>(null);
 
   useEffect(() => {
     if (!canvas) return;
@@ -34,7 +34,7 @@ const FrameTool: FC = () => {
       setStartPoint({ x, y });
       setIsDrawing(true);
 
-      const frame = new fabric.Rect({
+      const frame = new Rect({
         top: y,
         left: x,
         width: 0,
@@ -44,7 +44,6 @@ const FrameTool: FC = () => {
         borderScaleFactor: 1,
         borderColor: 'rgba(255,255,255,0.2)',
         hasBorders: true,
-        shadow: 'rgba(0,0,0,0.2) 0px 0px 5px',
       });
 
       frameRef.current = frame;
@@ -90,9 +89,9 @@ const FrameTool: FC = () => {
     return () => {
       enableObjectSelection(canvas);
       canvas.setCursor('default');
-      canvas.off('mouse:down');
-      canvas.off('mouse:move');
-      canvas.off('mouse:up');
+      canvas.off('mouse:down', handleMouseDown);
+      canvas.off('mouse:move', handleMouseMove);
+      canvas.off('mouse:up', handleMouseUp);
     };
   }, [isDrawing, startPoint, canvas]);
 

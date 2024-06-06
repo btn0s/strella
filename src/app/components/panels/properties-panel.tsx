@@ -1,6 +1,6 @@
 import { FC, useEffect, useState } from 'react';
 
-import { fabric } from 'fabric';
+import { FabricObject } from 'fabric';
 
 import { Input } from '@/app/components/ui/input';
 import Panel from '@/app/components/ui/panel';
@@ -8,7 +8,7 @@ import { useEditorContext } from '@/app/context/editor-context';
 
 const PropertiesPanel: FC = () => {
   const { canvas } = useEditorContext();
-  const [activeObject, setActiveObject] = useState<fabric.Object | null>(null);
+  const [activeObject, setActiveObject] = useState<FabricObject | null>(null);
   const [dimensions, setDimensions] = useState({
     left: 0,
     top: 0,
@@ -21,8 +21,8 @@ const PropertiesPanel: FC = () => {
 
     const handleSelection = () => {
       const obj = canvas.getActiveObject();
-      setActiveObject(obj);
       if (obj) {
+        setActiveObject(obj);
         setDimensions({
           left: obj.left || 0,
           top: obj.top || 0,
@@ -60,11 +60,11 @@ const PropertiesPanel: FC = () => {
       });
     };
 
-    const handleObjectMoving = (e: fabric.IEvent) => {
+    const handleObjectMoving = (e) => {
       if (e.target) updateDimensions(e.target);
     };
 
-    const handleObjectScaling = (e: fabric.IEvent) => {
+    const handleObjectScaling = (e) => {
       if (e.target) updateDimensions(e.target);
     };
 

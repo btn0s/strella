@@ -1,11 +1,11 @@
-import { fabric } from 'fabric';
+import { Canvas } from 'fabric';
 
-export const deselectActiveObject = (canvas: fabric.Canvas) => {
+export const deselectActiveObject = (canvas: Canvas) => {
   canvas.discardActiveObject();
   canvas.renderAll();
 };
 
-export const deleteActiveObject = (canvas: fabric.Canvas) => {
+export const deleteActiveObject = (canvas: Canvas) => {
   const activeObject = canvas.getActiveObjects();
 
   if (activeObject) {
@@ -17,7 +17,7 @@ export const deleteActiveObject = (canvas: fabric.Canvas) => {
   deselectActiveObject(canvas);
 };
 
-export const disableObjectSelection = (canvas: fabric.Canvas) => {
+export const disableObjectSelection = (canvas: Canvas) => {
   canvas.forEachObject((obj) => {
     obj.selectable = false;
     obj.lockMovementX = true;
@@ -27,7 +27,7 @@ export const disableObjectSelection = (canvas: fabric.Canvas) => {
   canvas.renderAll();
 };
 
-export const enableObjectSelection = (canvas: fabric.Canvas) => {
+export const enableObjectSelection = (canvas: Canvas) => {
   canvas.forEachObject((obj) => {
     obj.selectable = true;
     obj.lockMovementX = false;

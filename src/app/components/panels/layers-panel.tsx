@@ -1,13 +1,13 @@
 import { useEffect, useState } from 'react';
 
-import { fabric } from 'fabric';
+import { FabricObject } from 'fabric';
 
 import Panel from '@/app/components/ui/panel';
 import { useEditorContext } from '@/app/context/editor-context';
 
 const LayersPanel = () => {
   const { canvas } = useEditorContext();
-  const [layers, setLayers] = useState<fabric.Object[] | null>(null);
+  const [layers, setLayers] = useState<FabricObject[] | null>(null);
 
   useEffect(() => {
     if (!canvas) return;

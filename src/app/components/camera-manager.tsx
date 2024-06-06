@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 
-import { fabric } from 'fabric';
+import { Point } from 'fabric';
 
 import { useEditorContext } from '@/app/context/editor-context';
 
@@ -56,7 +56,7 @@ const CameraManager = () => {
         zoom *= 0.999 ** delta;
         if (zoom > 20) zoom = 20;
         if (zoom < 0.1) zoom = 0.1;
-        canvas.zoomToPoint(new fabric.Point(e.offsetX, e.offsetY), zoom);
+        canvas.zoomToPoint(new Point(e.offsetX, e.offsetY), zoom);
       } else if (vpt) {
         // Pan with default wheel
         vpt[4] -= e.deltaX;

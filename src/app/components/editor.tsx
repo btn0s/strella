@@ -1,7 +1,7 @@
 import { FC, useEffect, useRef, useState } from 'react';
 
 import { CursorArrowIcon, FrameIcon } from '@radix-ui/react-icons';
-import { fabric } from 'fabric';
+import { Canvas } from 'fabric';
 
 import CameraManager from '@/app/components/camera-manager';
 import LayersPanel from '@/app/components/panels/layers-panel';
@@ -60,12 +60,14 @@ const BottomToolbar: FC = () => {
 
 const Editor: FC = () => {
   const [activeTool, setActiveTool] = useState<EToolType>(EToolType.POINTER);
-  const [canvas, setCanvas] = useState<fabric.Canvas | null>(null);
+  const [canvas, setCanvas] = useState<Canvas | null>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
+    if (!canvasRef.current) return;
+
     const options = {};
-    const canvas = new fabric.Canvas(canvasRef.current, options);
+    const canvas = new Canvas(canvasRef.current, options);
 
     setCanvas(canvas);
 
