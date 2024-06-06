@@ -35,14 +35,7 @@ const LayersPanel = () => {
   return (
     <Panel>
       <p>Layers</p>
-      <Accordion type="multiple">
-        {layers?.map((layer, index) => (
-          <AccordionItem key={index} value={`layer-${index}`}>
-            <AccordionTrigger>{layer.type}</AccordionTrigger>
-            <AccordionContent>layer-{index}</AccordionContent>
-          </AccordionItem>
-        ))}
-      </Accordion>
+      <pre className="text-xs">{JSON.stringify(layers, null, 2)}</pre>
     </Panel>
   );
 };

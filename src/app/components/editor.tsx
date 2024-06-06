@@ -24,7 +24,7 @@ const LeftToolbar: FC = () => {
 
 const RightToolbar: FC = () => {
   return (
-    <div className="pointer-events-none absolute bottom-0 right-0 top-[30px] z-10 flex w-64 flex-col p-6">
+    <div className="pointer-events-none absolute bottom-0 right-0 top-[30px] z-10 flex w-64 flex-col gap-4 p-6">
       <PropertiesPanel />
     </div>
   );
