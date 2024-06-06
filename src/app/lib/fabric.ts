@@ -8,9 +8,19 @@ export const deselectActiveObject = (canvas: Canvas) => {
 export const deleteActiveObject = (canvas: Canvas) => {
   const activeObject = canvas.getActiveObjects();
 
-  if (activeObject) {
+  if (activeObject.length > 0) {
     activeObject.forEach((object) => {
+      const activeObjectParent = object.group;
+
+      if (activeObjectParent) {
+        activeObjectParent.remove(object);
+        canvas.remove(object);
+        canvas.requestRenderAll();
+        return;
+      }
+
       canvas.remove(object);
+      canvas.requestRenderAll();
     });
   }
 

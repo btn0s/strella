@@ -73,7 +73,7 @@ const Panel: FC<
     <Card
       ref={ref}
       className={cn(
-        'pointer-events-auto min-h-36 overflow-auto border border-white/20 px-3 py-2',
+        'pointer-events-auto min-h-36 overflow-auto px-3 py-2',
         className,
       )}
     >

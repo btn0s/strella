@@ -8,6 +8,7 @@ import LayersPanel from '@/app/components/panels/layers-panel';
 import PropertiesPanel from '@/app/components/panels/properties-panel';
 import ToolManager from '@/app/components/tool-manager';
 import { Button } from '@/app/components/ui/button';
+import { Card } from '@/app/components/ui/card';
 import {
   EditorContextProvider,
   useEditorContext,
@@ -16,7 +17,7 @@ import { EToolType } from '@/app/types/editor';
 
 const LeftToolbar: FC = () => {
   return (
-    <div className="pointer-events-none absolute bottom-0 left-0 top-[30px] z-10 flex w-full max-w-[350px] flex-col gap-4 p-6">
+    <div className="pointer-events-none absolute bottom-0 left-0 top-[12px] z-10 flex w-full max-w-[350px] flex-col gap-4 p-6">
       <LayersPanel />
     </div>
   );
@@ -24,7 +25,7 @@ const LeftToolbar: FC = () => {
 
 const RightToolbar: FC = () => {
   return (
-    <div className="pointer-events-none absolute bottom-0 right-0 top-[30px] z-10 flex w-full max-w-[250px] flex-col gap-4 p-6">
+    <div className="pointer-events-none absolute bottom-0 right-0 top-[12px] z-10 flex w-full max-w-[250px] flex-col gap-4 p-6">
       <PropertiesPanel />
     </div>
   );
@@ -34,7 +35,7 @@ const BottomToolbar: FC = () => {
   const { activeTool, setActiveTool } = useEditorContext();
   return (
     <div className="pointer-events-none absolute inset-x-0 bottom-0 z-10 flex items-center justify-center p-6">
-      <div className="pointer-events-auto flex gap-2 rounded-lg bg-card p-2">
+      <Card className="pointer-events-auto flex gap-2 rounded-lg bg-card p-2">
         <Button
           className="shadow"
           variant={activeTool === EToolType.POINTER ? 'default' : 'secondary'}
@@ -53,7 +54,7 @@ const BottomToolbar: FC = () => {
         >
           <FrameIcon />
         </Button>
-      </div>
+      </Card>
     </div>
   );
 };
@@ -85,7 +86,7 @@ const Editor: FC = () => {
         setActiveTool,
       }}
     >
-      <div style={{ width: '100vw', height: '100vh' }}>
+      <div style={{ width: '100vw', height: '100vh' }} className="bg-black/50">
         <canvas
           id="canvas"
           ref={canvasRef}

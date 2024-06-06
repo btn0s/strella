@@ -98,27 +98,41 @@ const PropertiesPanel: FC = () => {
     <Panel>
       <p className="mb-2">Active Object</p>
       {activeObject ? (
-        <div className="flex flex-col gap-2">
-          {(
-            [
-              ['left', 'top'],
-              ['width', 'height'],
-            ] as const
-          ).map((row) => (
-            <div className="flex gap-2">
-              {row.map((prop) => (
-                <div key={prop} className="flex flex-col">
-                  <span className="text-xs opacity-75">{prop}</span>
-                  <Input
-                    type="number"
-                    value={dimensions[prop]}
-                    onChange={handleChange(prop)}
-                  />
-                </div>
-              ))}
-            </div>
-          ))}
-        </div>
+        <>
+          <div className="flex flex-col gap-2">
+            {(
+              [
+                ['left', 'top'],
+                ['width', 'height'],
+              ] as const
+            ).map((row) => (
+              <div className="flex gap-2">
+                {row.map((prop) => (
+                  <div key={prop} className="flex flex-col">
+                    <span className="text-xs opacity-75">{prop}</span>
+                    <Input
+                      type="number"
+                      value={dimensions[prop]}
+                      onChange={handleChange(prop)}
+                    />
+                  </div>
+                ))}
+              </div>
+            ))}
+          </div>
+
+          <div className="flex gap-2">
+            <span className="text-xs opacity-75">fill</span>
+            <input
+              type="color"
+              value={activeObject.backgroundColor as string}
+              onChange={(e) => {
+                activeObject.set('backgroundColor', e.target.value);
+                canvas?.requestRenderAll();
+              }}
+            />
+          </div>
+        </>
       ) : (
         <p className="opacity-75">No active object</p>
       )}

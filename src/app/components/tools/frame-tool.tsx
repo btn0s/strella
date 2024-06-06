@@ -48,9 +48,8 @@ const FrameTool: FC = () => {
         height: 0,
         backgroundColor: 'white',
         fill: 'white',
-        borderScaleFactor: 1,
-        borderColor: 'rgba(255,255,255,0.2)',
-        hasBorders: true,
+        stroke: 'rgba(255,255,255,1)',
+        subTargetCheck: true,
         interactive: true,
         layoutManager: new LayoutManager(new FixedLayout()),
       });
@@ -59,8 +58,9 @@ const FrameTool: FC = () => {
 
       if (target && target instanceof Group) {
         target.add(frame);
+      } else {
+        canvas.add(frame);
       }
-      canvas.add(frame);
     };
 
     const handleMouseMove = (e) => {
