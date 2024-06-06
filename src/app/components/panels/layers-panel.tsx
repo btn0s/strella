@@ -2,12 +2,6 @@ import { useEffect, useState } from 'react';
 
 import { fabric } from 'fabric';
 
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from '@/app/components/ui/accordion';
 import Panel from '@/app/components/ui/panel';
 import { useEditorContext } from '@/app/context/editor-context';
 
