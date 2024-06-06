@@ -3,7 +3,11 @@ import { FC, useEffect, useRef, useState } from 'react';
 import { fabric } from 'fabric';
 
 import { useEditorContext } from '@/app/context/editor-context';
-import { deselectActiveObject } from '@/app/lib/fabric';
+import {
+  deselectActiveObject,
+  disableObjectSelection,
+  enableObjectSelection,
+} from '@/app/lib/fabric';
 import { EToolType } from '@/app/types/editor';
 
 const FrameTool: FC = () => {
@@ -19,6 +23,8 @@ const FrameTool: FC = () => {
     if (!canvas) return;
 
     deselectActiveObject(canvas);
+    disableObjectSelection(canvas);
+    canvas.setCursor('crosshair');
 
     const handleMouseDown = (e) => {
       canvas.selection = false;
@@ -47,6 +53,7 @@ const FrameTool: FC = () => {
     };
 
     const handleMouseMove = (e) => {
+      canvas.setCursor('crosshair');
       if (!isDrawing || !startPoint) return;
       const { x, y } = canvas.getPointer(e);
       const width = x - startPoint.x;
@@ -81,6 +88,8 @@ const FrameTool: FC = () => {
     });
 
     return () => {
+      enableObjectSelection(canvas);
+      canvas.setCursor('default');
       canvas.off('mouse:down');
       canvas.off('mouse:move');
       canvas.off('mouse:up');

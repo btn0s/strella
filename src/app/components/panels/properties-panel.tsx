@@ -6,7 +6,7 @@ import { Input } from '@/app/components/ui/input';
 import Panel from '@/app/components/ui/panel';
 import { useEditorContext } from '@/app/context/editor-context';
 
-const ActiveLayerPropertiesPanel: FC = () => {
+const PropertiesPanel: FC = () => {
   const { canvas } = useEditorContext();
   const [activeObject, setActiveObject] = useState<fabric.Object | null>(null);
   const [dimensions, setDimensions] = useState({
@@ -126,4 +126,4 @@ const ActiveLayerPropertiesPanel: FC = () => {
   );
 };
 
-export default ActiveLayerPropertiesPanel;
+export default PropertiesPanel;

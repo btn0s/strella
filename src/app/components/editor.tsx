@@ -4,39 +4,15 @@ import { CursorArrowIcon, FrameIcon } from '@radix-ui/react-icons';
 import { fabric } from 'fabric';
 
 import CameraManager from '@/app/components/camera-manager';
-import ActiveLayerPropertiesPanel from '@/app/components/panels/active-layer-properties';
+import LayersPanel from '@/app/components/panels/layers-panel';
+import PropertiesPanel from '@/app/components/panels/properties-panel';
 import ToolManager from '@/app/components/tool-manager';
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from '@/app/components/ui/accordion';
 import { Button } from '@/app/components/ui/button';
-import Panel from '@/app/components/ui/panel';
 import {
   EditorContextProvider,
   useEditorContext,
 } from '@/app/context/editor-context';
 import { EToolType } from '@/app/types/editor';
-
-const LayersPanel: FC = () => {
-  const { canvas } = useEditorContext();
-
-  return (
-    <Panel>
-      <p>Layers</p>
-      <Accordion type="multiple">
-        {canvas?.getObjects().map((layer, index) => (
-          <AccordionItem key={index} value={`layer-${index}`}>
-            <AccordionTrigger>{layer.type}</AccordionTrigger>
-            <AccordionContent>layer-{index}</AccordionContent>
-          </AccordionItem>
-        ))}
-      </Accordion>
-    </Panel>
-  );
-};
 
 const LeftToolbar: FC = () => {
   return (
@@ -49,7 +25,7 @@ const LeftToolbar: FC = () => {
 const RightToolbar: FC = () => {
   return (
     <div className="pointer-events-none absolute bottom-0 right-0 top-[30px] z-10 flex w-64 flex-col p-6">
-      <ActiveLayerPropertiesPanel />
+      <PropertiesPanel />
     </div>
   );
 };
