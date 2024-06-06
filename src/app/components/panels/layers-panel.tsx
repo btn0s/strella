@@ -13,6 +13,7 @@ const LayersPanel = () => {
     if (!canvas) return;
 
     const handleSelection = () => {
+      console.log('canvas.getObjects()', canvas.getObjects());
       setLayers(canvas.getObjects());
     };
     handleSelection();
@@ -24,10 +25,10 @@ const LayersPanel = () => {
       canvas.off('object:added', handleSelection);
       canvas.off('object:removed', handleSelection);
     };
-  }, []);
+  }, [canvas]);
 
   return (
-    <Panel>
+    <Panel className="max-h-[300px]">
       <p>Layers</p>
       <pre className="text-xs">{JSON.stringify(layers, null, 2)}</pre>
     </Panel>

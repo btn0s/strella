@@ -32,6 +32,7 @@ const CameraManager = () => {
           canvas.requestRenderAll();
           setLastPosX(e.clientX);
           setLastPosY(e.clientY);
+          canvas.setViewportTransform(vpt);
         }
       }
     };

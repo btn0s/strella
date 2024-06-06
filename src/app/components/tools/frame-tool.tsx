@@ -29,7 +29,7 @@ const FrameTool: FC = () => {
     const handleMouseDown = (e) => {
       canvas.selection = false;
 
-      const { x, y } = canvas.getPointer(e);
+      const { x, y } = canvas.getScenePoint(e);
 
       setStartPoint({ x, y });
       setIsDrawing(true);
@@ -54,7 +54,12 @@ const FrameTool: FC = () => {
     const handleMouseMove = (e) => {
       canvas.setCursor('crosshair');
       if (!isDrawing || !startPoint) return;
-      const { x, y } = canvas.getPointer(e);
+      const { x, y } = canvas.getScenePoint(e);
+      console.log({
+        x,
+        y,
+        startPoint,
+      });
       const width = x - startPoint.x;
       const height = y - startPoint.y;
 
@@ -76,15 +81,9 @@ const FrameTool: FC = () => {
       setStartPoint(null);
     };
 
-    canvas.on('mouse:down', function (options) {
-      handleMouseDown(options);
-    });
-    canvas.on('mouse:move', function (options) {
-      handleMouseMove(options);
-    });
-    canvas.on('mouse:up', function () {
-      handleMouseUp();
-    });
+    canvas.on('mouse:down', handleMouseDown);
+    canvas.on('mouse:move', handleMouseMove);
+    canvas.on('mouse:up', handleMouseUp);
 
     return () => {
       enableObjectSelection(canvas);

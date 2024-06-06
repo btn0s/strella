@@ -1,56 +1,81 @@
 import { FC, PropsWithChildren, useEffect, useRef, useState } from 'react';
 
 import { Card } from '@/app/components/ui/card';
+import { cn } from '@/app/lib/utils';
 
-const useIsPanelFocusedWithin = (ref: React.RefObject<HTMLDivElement>) => {
-  const [isPanelFocusedWithin, setIsPanelFocusedWithin] = useState(false);
+const useIsPanelHoveredOrFocusedWithin = (
+  ref: React.RefObject<HTMLDivElement>,
+) => {
+  const [isPanelHoveredOrFocusedWithin, setIsPanelHoveredOrFocusedWithin] =
+    useState(false);
 
   useEffect(() => {
-    const onFocusIn = () => setIsPanelFocusedWithin(true);
-    const onFocusOut = () => setIsPanelFocusedWithin(false);
+    const onMouseEnter = () => setIsPanelHoveredOrFocusedWithin(true);
+    const onMouseLeave = () => setIsPanelHoveredOrFocusedWithin(false);
+    const onFocusIn = () => setIsPanelHoveredOrFocusedWithin(true);
+    const onFocusOut = () => setIsPanelHoveredOrFocusedWithin(false);
 
     if (ref.current) {
+      ref.current.addEventListener('mouseenter', onMouseEnter);
+      ref.current.addEventListener('mouseleave', onMouseLeave);
       ref.current.addEventListener('focusin', onFocusIn);
       ref.current.addEventListener('focusout', onFocusOut);
     }
 
     return () => {
       if (ref.current) {
+        ref.current.removeEventListener('mouseenter', onMouseEnter);
+        ref.current.removeEventListener('mouseleave', onMouseLeave);
         ref.current.removeEventListener('focusin', onFocusIn);
         ref.current.removeEventListener('focusout', onFocusOut);
       }
     };
   }, [ref]);
 
-  return isPanelFocusedWithin;
+  return isPanelHoveredOrFocusedWithin;
 };
 
-const Panel: FC<PropsWithChildren> = ({ children }) => {
+const Panel: FC<
+  PropsWithChildren<{
+    className?: string;
+  }>
+> = ({ children, className }) => {
   const ref = useRef<HTMLDivElement>(null);
-  const isPanelFocusedWithin = useIsPanelFocusedWithin(ref);
+  const isPanelHoveredOrFocusedWithin = useIsPanelHoveredOrFocusedWithin(ref);
 
   useEffect(() => {
     if (!ref.current) return;
 
-    const onKeydown = (e: KeyboardEvent) => {
-      if (isPanelFocusedWithin) {
+    const stopPropagation = (e: Event) => {
+      if (isPanelHoveredOrFocusedWithin) {
         e.stopPropagation();
       }
     };
 
-    ref.current.addEventListener('keydown', onKeydown);
+    ref.current.addEventListener('keydown', stopPropagation);
+    ref.current.addEventListener('mousedown', stopPropagation);
+    ref.current.addEventListener('mouseup', stopPropagation);
+    ref.current.addEventListener('click', stopPropagation);
+    ref.current.addEventListener('wheel', stopPropagation);
 
     return () => {
       if (ref.current) {
-        ref.current.removeEventListener('keydown', onKeydown);
+        ref.current.removeEventListener('keydown', stopPropagation);
+        ref.current.removeEventListener('mousedown', stopPropagation);
+        ref.current.removeEventListener('mouseup', stopPropagation);
+        ref.current.removeEventListener('click', stopPropagation);
+        ref.current.removeEventListener('wheel', stopPropagation);
       }
     };
-  }, [isPanelFocusedWithin]);
+  }, [isPanelHoveredOrFocusedWithin]);
 
   return (
     <Card
       ref={ref}
-      className="pointer-events-auto min-h-36 overflow-auto border border-white/20 px-3 py-2"
+      className={cn(
+        'pointer-events-auto min-h-36 overflow-auto border border-white/20 px-3 py-2',
+        className,
+      )}
     >
       {children}
     </Card>
