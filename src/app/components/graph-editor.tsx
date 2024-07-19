@@ -129,55 +129,76 @@ const CustomNode: React.FC<NodeProps<NodeData>> = ({
         {data.label}
       </div>
       <div className="flex flex-col p-2">
-        <div className="relative h-2 mb-2">
-          {data.config.executionInputs.map((input) => (
-            <Handle
-              type="target"
-              position={Position.Left}
-              id={input}
-              isConnectable={isConnectable}
-              className="!w-2 !h-2 !rounded-[3px]"
-            />
-          ))}
-          {data.config.executionOutputs.map((output) => (
-            <Handle
-              type="source"
-              position={Position.Right}
-              id={output}
-              isConnectable={isConnectable}
-              className="!w-2 !h-2 !rounded-[3px]"
-            />
-          ))}
-        </div>
-        {data.config.inputs.map((input, index) => {
-          const output = data.config.outputs[index];
-          return (
-            <div key={input.name} className="relative flex justify-between">
-              <div>
-                <div className="text-xs pl-2 pr-6">{input.name}</div>
+        <div className="relative mb-2 flex">
+          <div className="flex flex-1 flex-col">
+            {data.config.executionInputs.map((input) => (
+              <div key={input} className="relative flex h-4">
                 <Handle
                   type="target"
                   position={Position.Left}
-                  id={input.name}
+                  id={input}
                   isConnectable={isConnectable}
-                  className="!w-2 !h-2"
+                  className="!w-2 !h-2 !rounded-[3px]"
                 />
               </div>
-              {output && (
-                <div key={output.name} className="relative text-right">
-                  <div className="text-xs pr-2 pl-6">{output.name}</div>
+            ))}
+          </div>
+          <div className="flex flex-1 flex-col items-end">
+            {data.config.executionOutputs.map((output) => (
+              <div key={output} className="relative flex h-4">
+                {output !== "default" && (
+                  <div className="text-xs pr-2 pl-6">{output}</div>
+                )}
+                <Handle
+                  type="source"
+                  position={Position.Right}
+                  id={output}
+                  isConnectable={isConnectable}
+                  className="!w-2 !h-2 !rounded-[3px]"
+                />
+              </div>
+            ))}
+          </div>
+        </div>
+        <div className="flex">
+          <div className="flex flex-1 flex-col">
+            {data.config.inputs.map((input, index) => {
+              return (
+                <div key={input.name} className="relative flex">
+                  <div className="text-xs pl-2 pr-6">{input.name}</div>
                   <Handle
-                    type="source"
-                    position={Position.Right}
-                    id={output.name}
+                    type="target"
+                    position={Position.Left}
+                    id={input.name}
                     isConnectable={isConnectable}
                     className="!w-2 !h-2"
                   />
                 </div>
-              )}
-            </div>
-          );
-        })}
+              );
+            })}
+          </div>
+          <div className="flex flex-col flex-1 items-end">
+            {data.config.outputs.map((output, index) => {
+              return (
+                <div
+                  key={output.name}
+                  className="relative flex justify-between"
+                >
+                  <div>
+                    <div className="text-xs pr-2 pl-6">{output.name}</div>
+                    <Handle
+                      type="source"
+                      position={Position.Right}
+                      id={output.name}
+                      isConnectable={isConnectable}
+                      className="!w-2 !h-2"
+                    />
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
       </div>
     </div>
   );
@@ -206,21 +227,22 @@ const onStartNode: Node<NodeData> = {
   },
 };
 
-const variableGetterConfig: NodeConfig = {
-  type: "variableGetter",
-  inputs: [{ name: "variableName", type: "string" }],
-  outputs: [{ name: "value", type: "any" }],
-  executionInputs: [],
-  executionOutputs: [],
-};
-
-const variableGetterNode: Node<NodeData> = {
-  id: "getter",
+const createVariableGetterNode = (
+  id: string,
+  variableName: string,
+): Node<NodeData> => ({
+  id,
   type: "custom",
-  position: { x: 200, y: 0 },
+  position: { x: 200, y: Math.random() * 300 }, // Random y position to avoid overlap
   data: {
-    label: "Get Variable",
-    config: variableGetterConfig,
+    label: `Get ${variableName}`,
+    config: {
+      type: "variableGetter",
+      inputs: [],
+      outputs: [{ name: "value", type: "any" }],
+      executionInputs: [],
+      executionOutputs: [],
+    },
     execute: (
       inputs,
       executionInputs,
@@ -228,32 +250,29 @@ const variableGetterNode: Node<NodeData> = {
       triggerExecutionOutputs,
       globalVariables,
     ) => {
-      const variableName = inputs.variableName || "Values";
       const value = globalVariables.variables[variableName];
       console.log(`Retrieved value of ${variableName}:`, value);
       setOutputs({ value });
     },
   },
-};
+});
 
-const variableSetterConfig: NodeConfig = {
-  type: "variableSetter",
-  inputs: [
-    { name: "variableName", type: "string" },
-    { name: "value", type: "any" },
-  ],
-  outputs: [{ name: "value", type: "any" }],
-  executionInputs: ["default"],
-  executionOutputs: ["default"],
-};
-
-const variableSetterNode: Node<NodeData> = {
-  id: "setter",
+const createVariableSetterNode = (
+  id: string,
+  variableName: string,
+): Node<NodeData> => ({
+  id,
   type: "custom",
-  position: { x: 600, y: 0 },
+  position: { x: 600, y: Math.random() * 300 }, // Random y position to avoid overlap
   data: {
-    label: "Set Variable",
-    config: variableSetterConfig,
+    label: `Set ${variableName}`,
+    config: {
+      type: "variableSetter",
+      inputs: [{ name: "value", type: "any" }],
+      outputs: [{ name: "value", type: "any" }],
+      executionInputs: ["default"],
+      executionOutputs: ["default"],
+    },
     execute: (
       inputs,
       executionInputs,
@@ -261,21 +280,26 @@ const variableSetterNode: Node<NodeData> = {
       triggerExecutionOutputs,
       globalVariables,
     ) => {
-      const variableName = inputs.variableName || "Sum";
       const value = inputs.value !== undefined ? inputs.value : 0;
       globalVariables.setVariable(variableName, value);
       console.log(`Set ${variableName} to`, value);
       triggerExecutionOutputs(["default"]);
     },
   },
-};
+});
 
 const forEachConfig: NodeConfig = {
   type: "forEach",
   inputs: [{ name: "array", type: "array" }],
-  outputs: [{ name: "currentItem", type: "any" }],
+  outputs: [
+    {
+      name: "index",
+      type: "number",
+    },
+    { name: "currentItem", type: "any" },
+  ],
   executionInputs: ["default"],
-  executionOutputs: ["iteration", "complete"],
+  executionOutputs: ["complete", "iteration"],
 };
 
 const forEachNode: Node<NodeData> = {
@@ -368,13 +392,71 @@ const Flow: React.FC = () => {
 
   const [nodes, setNodes, onNodesChange] = useNodesState([
     onStartNode,
-    variableGetterNode,
-    variableSetterNode,
+    createVariableGetterNode("getter-values-1", "Values"),
+    createVariableGetterNode("getter-sum-1", "Sum"),
+    createVariableGetterNode("getter-sum-2", "Sum"),
+    createVariableSetterNode("setter-sum-1", "Sum"),
     forEachNode,
     addNode,
     consoleLogNode,
   ]);
-  const [edges, setEdges, onEdgesChange] = useEdgesState([]);
+  const [edges, setEdges, onEdgesChange] = useEdgesState([
+    {
+      id: "e1-2",
+      source: "onStart",
+      sourceHandle: "default",
+      target: "forEach",
+    },
+    {
+      id: "e2-3",
+      source: "getter-values-1",
+      sourceHandle: "value",
+      target: "forEach",
+      targetHandle: "array",
+    },
+    {
+      id: "e3-4",
+      source: "forEach",
+      sourceHandle: "iteration",
+      target: "add",
+      targetHandle: "default",
+    },
+    {
+      id: "e3-5",
+      source: "forEach",
+      sourceHandle: "complete",
+      target: "consoleLog",
+      targetHandle: "default",
+    },
+    {
+      id: "e3-6",
+      source: "forEach",
+      sourceHandle: "currentItem",
+      target: "add",
+      targetHandle: "a",
+    },
+    {
+      id: "e4-4",
+      source: "getter-sum-1",
+      sourceHandle: "value",
+      target: "add",
+      targetHandle: "b",
+    },
+    {
+      id: "e4-5",
+      source: "add",
+      sourceHandle: "result",
+      target: "setter-sum-1",
+      targetHandle: "value",
+    },
+    {
+      id: "e5-6",
+      source: "getter-sum-2",
+      sourceHandle: "value",
+      target: "consoleLog",
+      targetHandle: "value",
+    },
+  ]);
 
   const onConnect = useCallback(
     (params: Edge | Connection) => setEdges((eds) => addEdge(params, eds)),
@@ -430,6 +512,16 @@ const Flow: React.FC = () => {
     });
   };
 
+  const addVariableNode = (type: "getter" | "setter", variableName: string) => {
+    const id = `${type}-${variableName}-${Date.now()}`;
+    const newNode =
+      type === "getter"
+        ? createVariableGetterNode(id, variableName)
+        : createVariableSetterNode(id, variableName);
+
+    setNodes((nds) => [...nds, newNode]);
+  };
+
   return (
     <GlobalVariablesContext.Provider
       value={{ variables: globalVariables, setVariable }}
@@ -450,6 +542,28 @@ const Flow: React.FC = () => {
         >
           Execute Flow
         </button>
+        <div
+          className="flex flex-col"
+          style={{ position: "absolute", top: 50, right: 10 }}
+        >
+          {Object.keys(globalVariables).map((variableName) => (
+            <div key={variableName} className="flex justify-between mb-2">
+              <div className="flex items-center mr-2">{variableName}</div>
+              <button
+                onClick={() => addVariableNode("getter", variableName)}
+                className="bg-green-500 text-white px-4 py-2 rounded-lg mr-2"
+              >
+                + Getter
+              </button>
+              <button
+                onClick={() => addVariableNode("setter", variableName)}
+                className="bg-red-500 text-white px-4 py-2 rounded-lg"
+              >
+                + Setter
+              </button>
+            </div>
+          ))}
+        </div>
         <div style={{ position: "absolute", top: 10, left: 10 }}>
           Global Variables: {JSON.stringify(globalVariables)}
         </div>
