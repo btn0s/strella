@@ -14,7 +14,7 @@ import {
   type Edge,
 } from "@xyflow/react";
 
-import FlowComponent from "@/app/components/graph-editor";
+import FlowWithProvider from "@/app/components/graph/flow";
 import { EditorContextProvider } from "@/app/context/editor";
 import { StrellaProject } from "@/types";
 
@@ -89,7 +89,7 @@ function Index() {
     <EditorContextProvider value={{ project, setProject }}>
       <div className="h-svh w-svw isolate">
         {/*Editor experience goes here*/}
-        <FlowComponent />
+        <FlowWithProvider />
       </div>
     </EditorContextProvider>
   );
