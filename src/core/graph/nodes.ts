@@ -22,7 +22,7 @@ export const onStartNode: Node<NodeData> = {
     outputs: {},
     status: "idle",
     execute: async (inputs, triggerExecutionOutput, globalVariables) => {
-      console.log("Execution started");
+      console.log("NODE DEBUG: onStart node executed");
       return {};
     },
   },
@@ -49,8 +49,12 @@ export const createVariableGetterNode = (
     outputs: {},
     status: "idle",
     execute: async (inputs, triggerExecutionOutput, globalVariables) => {
+      console.log("NODE DEBUG: variableGetter node executed");
       const value = globalVariables.variables[variableName];
-      console.log(`Retrieved value of ${variableName}:`, value);
+      console.log(
+        `NODE DEBUG: variableGetter node retrieved value of ${variableName}:`,
+        value,
+      );
       return { value };
     },
   },
@@ -80,9 +84,17 @@ export const createVariableSetterNode = (
     outputs: {},
     status: "idle",
     execute: async (inputs, triggerExecutionOutput, globalVariables) => {
+      console.log("NODE DEBUG: variableSetter node executed");
       const value = inputs.value !== undefined ? inputs.value : 0;
+      console.log(
+        `NODE DEBUG: variableSetter node setting ${variableName} to`,
+        value,
+      );
       globalVariables.setVariable(variableName, value);
-      console.log(`Set ${variableName} to`, value);
+      console.log(
+        `NODE DEBUG: variableSetter node set ${variableName} to`,
+        value,
+      );
       return { value };
     },
   },
@@ -105,25 +117,26 @@ export const forEachNode: Node<NodeData> = {
         { name: "currentItem", type: "any" },
       ],
       execInputs: ["default"],
-      execOutputs: ["complete", "iteration"],
+      execOutputs: ["default", "iteration"],
     },
     inputs: {},
     outputs: {},
     status: "idle",
     execute: async (inputs, triggerExecutionOutput, globalVariables) => {
+      console.log("NODE DEBUG: forEach node executed");
       const runLoop = async () => {
         const array = inputs.array;
         if (Array.isArray(array)) {
           array.forEach((item, index) => {
-            console.log(`ForEach item ${index}:`, item);
+            console.log(`NODE DEBUG: forEach node item ${index}:`, item);
             triggerExecutionOutput("iteration");
           });
-          triggerExecutionOutput("complete");
         } else {
-          console.error(`Input is not an array`);
+          console.error(`NODE DEBUG: forEach node input is not an array`);
         }
       };
       await runLoop();
+      console.log("NODE DEBUG: forEach node completed");
       return {};
     },
   },
@@ -149,8 +162,9 @@ export const addNode: Node<NodeData> = {
     outputs: {},
     status: "idle",
     execute: async (inputs, triggerExecutionOutput, globalVariables) => {
+      console.log("NODE DEBUG: add node executed", { inputs });
       const result = (inputs.a || 0) + (inputs.b || 0);
-      triggerExecutionOutput("default");
+      console.log(`NODE DEBUG: add node result:`, { result });
       return { result };
     },
   },
@@ -173,7 +187,8 @@ export const consoleLogNode: Node<NodeData> = {
     outputs: {},
     status: "idle",
     execute: async (inputs, triggerExecutionOutput, globalVariables) => {
-      console.log("Logged value:", inputs.value);
+      console.log("NODE DEBUG: consoleLog node executed");
+      console.log(`NODE DEBUG: consoleLog node value:`, inputs.value);
       return {};
     },
   },

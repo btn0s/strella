@@ -86,7 +86,7 @@ const Flow: React.FC = () => {
     {
       id: "e3-5",
       source: "forEach-1",
-      sourceHandle: "complete",
+      sourceHandle: "default",
       target: "consoleLog-1",
       targetHandle: "default",
     },
@@ -132,43 +132,188 @@ const Flow: React.FC = () => {
     [setEdges],
   );
 
-  const execNode = async (nodeId: string): Promise<{ [p: string]: any }> => {
-    const node = nodes.find((n) => n.id === nodeId);
-    const value = await node.data.execute({}, () => {}, {
-      variables: globalVariables,
-      setVariable,
-    });
-    return value;
+  type ExecutionContext = {
+    nodeOutputs: { [nodeId: string]: any };
+    iterationData?: any;
   };
 
   const handleExecute = async () => {
-    const flow = nodes.map(async (n) => {
-      // 1. find the next node in the execution flow using the edges state
-      const nextNode = edges.find((e) => e.source === n.id);
-      // 2. get all value inputs of the node using the edges state
-      const valueInputs = edges.filter((e) => e.target === n.id);
-      // 3. get all values of the value inputs by executing the valueInputs nodes
-      const values = await Promise.allSettled(
-        valueInputs.map(async (e) => {
-          const node = nodes.find((n) => n.id === e.source);
-          const value = await execNode(node.id);
-          return value;
-        }),
+    const dataDependencies: { [nodeId: string]: Set<string> } = {};
+    const nodeOutputs: { [nodeId: string]: any } = {};
+
+    // Build data dependency graph
+    const buildDataDependencies = (nodeId: string) => {
+      if (dataDependencies[nodeId]) return;
+      dataDependencies[nodeId] = new Set();
+
+      const inputEdges = edges.filter(
+        (e) => e.target === nodeId && e.targetHandle !== "default",
       );
-      // 4. execute the node using the dependency values
-      // 5. update the node status
-      // 6. update the node outputs
-      // 7. continue with the next node
+      for (const edge of inputEdges) {
+        dataDependencies[nodeId].add(edge.source);
+        buildDataDependencies(edge.source);
+      }
+    };
 
-      console.log({
-        nodeId: n.id,
-        nextNode,
-        valueInputs,
-        values,
-      });
-    });
+    // Resolve data dependencies
+    const resolveDataDependencies = async (
+      nodeId: string,
+      context: ExecutionContext,
+    ): Promise<void> => {
+      if (nodeId in context.nodeOutputs) return;
 
-    console.log("DEBUG: flow:", { flow });
+      const deps = dataDependencies[nodeId] || new Set();
+      for (const depId of deps) {
+        await resolveDataDependencies(depId, context);
+      }
+
+      if (!(nodeId in context.nodeOutputs)) {
+        await executeNode(nodeId, false, context);
+      }
+    };
+
+    const executeNode = async (
+      nodeId: string,
+      triggerOutputs: boolean,
+      context: ExecutionContext,
+    ): Promise<void> => {
+      const node = nodes.find((n) => n.id === nodeId);
+      if (!node) throw new Error(`Node ${nodeId} not found`);
+
+      setNodes((nds) =>
+        nds.map((n) =>
+          n.id === nodeId
+            ? { ...n, data: { ...n.data, status: "running" } }
+            : n,
+        ),
+      );
+
+      const resolveInput = async (edge: Edge) => {
+        if (
+          context.iterationData &&
+          edge.sourceHandle in context.iterationData
+        ) {
+          return context.iterationData[edge.sourceHandle];
+        }
+        const sourceNode = nodes.find((n) => n.id === edge.source);
+        if (
+          sourceNode &&
+          sourceNode.data.config.execOutputs.length === 0 &&
+          !(edge.source in context.nodeOutputs)
+        ) {
+          // This is likely a getter node, execute it on demand
+          await executeNode(edge.source, false, context);
+        }
+        return context.nodeOutputs[edge.source]?.[
+          edge.sourceHandle || "default"
+        ];
+      };
+
+      const inputEdges = edges.filter((e) => e.target === nodeId);
+      const inputs = await Promise.all(
+        inputEdges.map(async (edge) => ({
+          [edge.targetHandle || "default"]: await resolveInput(edge),
+        })),
+      ).then((results) => Object.assign({}, ...results));
+
+      try {
+        if (node.data.config.type === "forEach") {
+          const array = inputs.array;
+          if (Array.isArray(array)) {
+            for (let index = 0; index < array.length; index++) {
+              const iterationContext: ExecutionContext = {
+                nodeOutputs: { ...context.nodeOutputs },
+                iterationData: { index, currentItem: array[index] },
+              };
+
+              const iterationOutputs = await node.data.execute(
+                { ...inputs, ...iterationContext.iterationData },
+                async (outputPort) => {
+                  const outputEdges = edges.filter(
+                    (e) => e.source === nodeId && e.sourceHandle === outputPort,
+                  );
+                  for (const edge of outputEdges) {
+                    await executeNode(edge.target, true, iterationContext);
+                  }
+                },
+                { variables: globalVariables, setVariable },
+              );
+
+              // Update the main context with the results of this iteration
+              Object.assign(context.nodeOutputs, iterationContext.nodeOutputs);
+              console.log(
+                `Iteration ${index} of forEach node ${nodeId}. Outputs:`,
+                iterationOutputs,
+              );
+            }
+          } else {
+            console.error(`ForEach input is not an array for node ${nodeId}`);
+          }
+        } else {
+          const outputs = await node.data.execute(
+            inputs,
+            async (outputPort) => {
+              if (triggerOutputs) {
+                const outputEdges = edges.filter(
+                  (e) => e.source === nodeId && e.sourceHandle === outputPort,
+                );
+                for (const edge of outputEdges) {
+                  await executeNode(edge.target, true, context);
+                }
+              }
+            },
+            { variables: globalVariables, setVariable },
+          );
+          context.nodeOutputs[nodeId] = outputs;
+          console.log(
+            `Executed node ${nodeId}. Inputs:`,
+            inputs,
+            "Outputs:",
+            outputs,
+          );
+        }
+
+        setNodes((nds) =>
+          nds.map((n) =>
+            n.id === nodeId
+              ? { ...n, data: { ...n.data, status: "completed" } }
+              : n,
+          ),
+        );
+      } catch (error) {
+        console.error(`Error executing node ${nodeId}:`, error);
+        setNodes((nds) =>
+          nds.map((n) =>
+            n.id === nodeId
+              ? { ...n, data: { ...n.data, status: "error" } }
+              : n,
+          ),
+        );
+      }
+    };
+
+    // Main execution function
+    const executeFlow = async (startNodeId: string): Promise<void> => {
+      const context: ExecutionContext = { nodeOutputs: {} };
+      await resolveDataDependencies(startNodeId, context);
+      await executeNode(startNodeId, true, context);
+
+      const outputEdges = edges.filter(
+        (e) => e.source === startNodeId && e.sourceHandle === "default",
+      );
+      for (const edge of outputEdges) {
+        await executeFlow(edge.target);
+      }
+    };
+
+    // Start execution
+    try {
+      nodes.forEach((node) => buildDataDependencies(node.id));
+      await executeFlow("onStart");
+      console.log("Flow execution completed. Node outputs:", nodeOutputs);
+    } catch (error) {
+      console.error("Error during flow execution:", error);
+    }
   };
 
   const addVariableNode = (type: "getter" | "setter", variableName: string) => {

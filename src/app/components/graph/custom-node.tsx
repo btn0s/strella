@@ -102,12 +102,21 @@ const CustomNode: React.FC<NodeProps<CustomNodeType>> = ({ data }) => {
   return (
     <div
       className={cn("bg-card border border-border rounded-lg shadow-md", {
-        "bg-gray-500": data.status === "error",
-        "bg-green-500": data.status === "completed",
-        "bg-blue-500": data.status === "running",
+        "border-red-500 bg-red-50": data.status === "error",
+        "border-green-500 bg-green-50": data.status === "completed",
+        "border-blue-500 bg-blue-50": data.status === "running",
       })}
     >
-      <div className="flex text-xs justify-between px-2 gap-6 py-1 border-b border-border">
+      <div
+        className={cn(
+          "flex text-xs justify-between px-2 gap-6 py-1 border-b border-border",
+          {
+            "border-red-500": data.status === "error",
+            "border-green-500": data.status === "completed",
+            "border-blue-500": data.status === "running",
+          },
+        )}
+      >
         <span className="font-mono">{data.label}</span>
         <span className="text-xs text-gray-500">{nodeId}</span>
       </div>
