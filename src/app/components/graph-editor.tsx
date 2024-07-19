@@ -373,6 +373,124 @@ const consoleLogNode: Node<NodeData> = {
   },
 };
 
+// Function to execute a node
+const executeNode = (
+  nodeId: string,
+  nodes: Node[],
+  edges: Edge[],
+  globalVariables: GlobalVariablesContextType,
+  executeNodeCallback: (nodeId: string) => void,
+  setNodes: React.Dispatch<React.SetStateAction<Node[]>>,
+) => {
+  const node = nodes.find((n) => n.id === nodeId);
+  if (!node || !node.data.execute) return;
+
+  // Retrieve the input values for the node
+  const inputs = getNodeInputs(nodeId, nodes, edges);
+
+  // Check if the node has any inputs that need to fetch values from getter nodes
+  const valueInputs = node.data.config.inputs.filter((input) =>
+    ["string", "number", "boolean", "array", "object", "any"].includes(
+      input.type,
+    ),
+  );
+
+  // If there are value inputs, find the corresponding getter nodes and execute them first
+  valueInputs.forEach((input) => {
+    const edge = edges.find(
+      (e) => e.target === nodeId && e.targetHandle === input.name,
+    );
+    if (edge) {
+      const getterNodeId = edge.source;
+      const getterNode = nodes.find((n) => n.id === getterNodeId);
+      if (getterNode && getterNode.data.execute) {
+        // Execute the getter node
+        getterNode.data.execute(
+          {},
+          [],
+          (getterOutputs) => {
+            inputs[input.name] = getterOutputs.value;
+            // Continue with the execution of the main node after the getter node has provided its value
+            node.data.execute(
+              inputs,
+              node.data.config.executionInputs,
+              (outputs) => {
+                setNodes((nds) =>
+                  nds.map((n) =>
+                    n.id === nodeId
+                      ? { ...n, data: { ...n.data, outputs } }
+                      : n,
+                  ),
+                );
+              },
+              (outputIds) => {
+                outputIds.forEach((outputId) => {
+                  const connectedEdges = edges.filter(
+                    (edge) =>
+                      edge.source === nodeId && edge.sourceHandle === outputId,
+                  );
+                  connectedEdges.forEach((edge) => {
+                    executeNodeCallback(edge.target);
+                  });
+                });
+              },
+              globalVariables,
+            );
+          },
+          () => {},
+          globalVariables,
+        );
+      }
+    }
+  });
+
+  // Execute the main node logic
+  node.data.execute(
+    inputs,
+    node.data.config.executionInputs,
+    (outputs) => {
+      setNodes((nds) =>
+        nds.map((n) =>
+          n.id === nodeId ? { ...n, data: { ...n.data, outputs } } : n,
+        ),
+      );
+    },
+    (outputIds) => {
+      outputIds.forEach((outputId) => {
+        const connectedEdges = edges.filter(
+          (edge) => edge.source === nodeId && edge.sourceHandle === outputId,
+        );
+        connectedEdges.forEach((edge) => {
+          executeNodeCallback(edge.target);
+        });
+      });
+    },
+    globalVariables,
+  );
+};
+
+// Function to execute the flow
+const executeFlow = (
+  startNodeId: string,
+  nodes: Node[],
+  edges: Edge[],
+  globalVariables: GlobalVariablesContextType,
+  setNodes: React.Dispatch<React.SetStateAction<Node[]>>,
+) => {
+  const executeNodeCallback = (nodeId: string) => {
+    executeNode(
+      nodeId,
+      nodes,
+      edges,
+      globalVariables,
+      executeNodeCallback,
+      setNodes,
+    );
+  };
+
+  executeNodeCallback(startNodeId);
+};
+
 // Main component
 const Flow: React.FC = () => {
   const [globalVariables, setGlobalVariables] = useState<{
@@ -463,53 +581,17 @@ const Flow: React.FC = () => {
     [setEdges],
   );
 
-  const executeFlow = useCallback(
-    (
-      startNodeId: string,
-      nodes: Node[],
-      edges: Edge[],
-      globalVariables: GlobalVariablesContextType,
-    ) => {
-      const executeNode = (nodeId: string) => {
-        const node = nodes.find((n) => n.id === nodeId);
-        if (!node || !node.data.execute) return;
-
-        const inputs = getNodeInputs(nodeId, nodes, edges);
-        node.data.execute(
-          inputs,
-          node.data.config.executionInputs,
-          (outputs) => {
-            setNodes((nds) =>
-              nds.map((n) =>
-                n.id === nodeId ? { ...n, data: { ...n.data, outputs } } : n,
-              ),
-            );
-          },
-          (outputIds) => {
-            outputIds.forEach((outputId) => {
-              const connectedEdges = edges.filter(
-                (edge) =>
-                  edge.source === nodeId && edge.sourceHandle === outputId,
-              );
-              connectedEdges.forEach((edge) => {
-                executeNode(edge.target);
-              });
-            });
-          },
-          globalVariables,
-        );
-      };
-
-      executeNode(startNodeId);
-    },
-    [setNodes],
-  );
-
   const handleExecute = () => {
-    executeFlow("onStart", nodes, edges, {
-      variables: globalVariables,
-      setVariable,
-    });
+    executeFlow(
+      "onStart",
+      nodes,
+      edges,
+      {
+        variables: globalVariables,
+        setVariable,
+      },
+      setNodes,
+    );
   };
 
   const addVariableNode = (type: "getter" | "setter", variableName: string) => {
