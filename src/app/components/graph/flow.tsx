@@ -339,6 +339,7 @@ const Flow: React.FC = () => {
           onConnect={onConnect}
           nodeTypes={nodeTypes}
           fitView
+          fitViewOptions={{ padding: 1 }}
           snapGrid={[12, 12]}
           snapToGrid
         >
