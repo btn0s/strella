@@ -21,7 +21,7 @@ The implementation is organized into phases, with each phase broken down into sm
 1. **Type-First Development:** Define solid TypeScript interfaces before implementation
 2. **Iterative POCs:** Build small, focused proofs-of-concept that validate key assumptions
 3. **Vertical Slices:** Create end-to-end functionality for specific use cases early
-4. **Test-Driven:** Incorporate testing at each phase, not as an afterthought
+4. **User-Centric Validation:** Test features based on user capabilities, not technical completeness
 5. **Local-First, Sync-Second:** Ensure solid single-user experience before expanding to collaboration
 
 ### Key Strategic Recommendations
@@ -29,11 +29,11 @@ The implementation is organized into phases, with each phase broken down into sm
 1. **Initial Spike Phase (Phase 0):** Create a minimal end-to-end prototype to validate core technologies (Yjs + React Flow)
 2. **Vertical Slice Focus:** Ensure at least one node type works end-to-end through the entire stack early
 3. **UX Prototyping:** Create UI mockups to validate UX before full implementation
-4. **Early Collaboration Testing:** Build tools to visualize and debug multi-user scenarios
-5. **Performance Monitoring:** Establish benchmarks early and monitor throughout development
+4. **Core User Journey:** Prioritize implementing a complete user flow over technical completeness
+5. **Just-Enough Technical Validation:** Test only what directly impacts user experience
 6. **Dependency Isolation:** Create clear module boundaries to isolate core libraries (React Flow, Yjs)
 7. **Progressive Enhancement:** Build single-user functionality first, then layer on collaboration features
-8. **Developer Tooling:** Invest in tools that speed up development of subsequent phases
+8. **Quick Iteration:** Ship a working vertical slice sooner, then improve based on actual use
 
 ### Vertical Slice Priority & Stubbing Strategy
 
@@ -51,11 +51,11 @@ To stay focused on validating core architecture quickly, we'll prioritize a comp
    - **Node Types:** Implement a minimal set (5-7) of essential node types thoroughly
 
 3. **Critical Validations:**
-   - CRDT data model effectiveness
-   - React Flow integration performance
-   - Execution engine correctness
-   - Collaboration model usability
-   - Persistence reliability
+   - **Creation Flow:** Can users create and connect nodes intuitively?
+   - **Reactivity:** Do changes in one part of the system properly update others?
+   - **Execution:** Can users build logic that executes correctly?
+   - **Comprehension:** Do users understand the mental model of the system?
+   - **Reliability:** Can work be saved and restored faithfully?
 
 This approach ensures we validate our core architectural assumptions quickly without being distracted by complex but non-critical features.
 
@@ -128,11 +128,11 @@ This approach ensures we validate our core architectural assumptions quickly wit
   - Test offline editing and state recovery
   - Develop schema versioning/migration strategy
 
-- **2.4 Collaboration Visualization Tools**
-  - Create visual indicators for remote user actions
-  - Implement debug views for CRDT operations
-  - Build network condition simulator for testing edge cases
-  - Create tools to inspect document history and conflicts
+- **2.4 Collaboration Awareness**
+  - Create simple user presence indicators (avatar, cursor)
+  - Implement basic connection status indicators
+  - Add minimal conflict resolution UI if needed
+  - *(Defer)* Advanced debugging tools for collaboration edge cases
 
 **Milestone:** Conduct usability testing on core graph editing and execution flow.
 
@@ -201,10 +201,10 @@ This approach ensures we validate our core architectural assumptions quickly wit
   - *(Defer)* Comprehensive telemetry and diagnostics
 
 - **5.4 Comprehensive Integration Testing**
-  - Create core end-to-end test suite for the vertical slice *(Phase 2-3 priority)*
-  - Build basic performance benchmarks for CRDT operations *(Phase 2 priority)*
-  - Test minimal multi-user scenarios *(Phase 3-4 priority)*
-  - *(Defer)* Exhaustive cross-platform validation
+  - Create user journey tests focusing on main workflows
+  - Validate that common user scenarios work reliably
+  - Test minimal multi-user collaboration on key tasks
+  - *(Defer)* Exhaustive compatibility testing across all platforms
 
 **Milestone:** Validate basic Design Mode interactions through user testing with simplified implementation.
 
@@ -212,14 +212,14 @@ This approach ensures we validate our core architectural assumptions quickly wit
 
 ### Key Milestones
 
-1. **Spike Complete** - Basic Yjs + React Flow integration validated
-2. **Types Defined** - Complete type system established
-3. **Single Node Vertical Slice** - One node type working end-to-end (highest priority validation)
-4. **Basic Graph Editor** - Multiple node types with connections, persisted locally
-5. **Execution Engine** - Working graph execution
-6. **Collaboration Ready** - Multi-user editing with simple presence indicators
-7. **MVP Release** - Complete vertical slice with minimal viable features
-8. **Production Release** - Enhanced features on solid foundation
+1. **Design Flow Working** - Users can add nodes and connect them visually
+2. **Basic State Management** - Users can create variables and see them update
+3. **Interactive Component** - Users can create a simple interactive component (e.g., button updates text)
+4. **Component Composition** - Users can nest and reuse components
+5. **Persistence Functional** - Users can save work and reload it later
+6. **Basic Collaboration** - Multiple users can edit the same document
+7. **MVP Release** - Complete vertical slice enabling a useful creative workflow
+8. **Production Release** - Polished experience with refined interactions
 
 ### Critical Path Dependencies
 
@@ -256,6 +256,11 @@ This approach ensures we validate our core architectural assumptions quickly wit
    - *Mitigation:* Adhere to the defined vertical slice priorities and stubbing strategy
    - *High-Risk Distractions:* Full canvas-based design tools, advanced collaboration features, comprehensive developer tooling
    - *Mitigation Approach:* For each feature, implement the simplest version that validates the core architecture
+
+4. **Technical Perfectionism** - Overinvesting in technical optimization before validating product fit
+   - *Mitigation:* Focus on user capabilities over technical perfection
+   - *Example:* Accepting "good enough" performance in early versions before extensive optimization
+   - *Decision Gate:* Only optimize when a specific user experience issue is identified
 
 ## Conclusion
 
