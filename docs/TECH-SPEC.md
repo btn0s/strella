@@ -28,6 +28,8 @@ This specification targets an initial vertical slice implementation focused on T
 
 The implementation follows a progressive enhancement approach, starting with simpler versions of each system component and adding complexity only as needed to support user capabilities. This ensures rapid validation of core architectural assumptions without getting distracted by advanced features.
 
+**Note on Supplementary Wireframes:** Conceptual wireframes are available in the `/docs/wireframes` directory to illustrate potential UI layouts for the components described in this document. These wireframes are provided as visual reference only and should not be considered prescriptive. All architectural and implementation decisions should be driven by the specifications in this document, the PRD, and the Implementation Plan, which together serve as the authoritative source of truth.
+
 ---
 
 ## 0. Guiding Principles

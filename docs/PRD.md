@@ -17,6 +17,10 @@ The initial implementation will focus on a vertical slice approach, targeting TO
 
 This focused approach ensures we can quickly validate the core experience before expanding to more complex scenarios.
 
+### Note on Supplementary Materials
+
+While conceptual wireframes exist in the `/docs/wireframes` directory to help visualize some of the concepts in this document, this PRD serves as the authoritative specification. The wireframes are intended only as visual aids and should not supersede any specifications detailed in this document. Implementation decisions should always refer back to this PRD, the Technical Specification, and the Implementation Plan as the source of truth.
+
 ### Core Principles
 
 The core of Strella is its commitment to **three** complementary principles:
