@@ -7,6 +7,13 @@
 
 This document outlines the tactical implementation approach for Strella, the local-first Visual Development Environment (VDE) with real-time collaboration features. It's intended to be used alongside the `TECH-SPEC.md` document, which defines the *what* (specifications), while this plan covers the *how* (implementation approach).
 
+The initial implementation focuses on TODO app complexity to validate core architectural concepts quickly:
+- Supporting simple interactive components with 2-3 node types
+- Building basic state management capabilities
+- Enabling 2-user real-time collaboration
+- Implementing a simplified Design Mode with Structure Panel
+- Creating a complete vertical slice before adding complexity
+
 The implementation is organized into phases, with each phase broken down into smaller, achievable milestones. This approach enables:
 
 - Early validation of core architectural assumptions
@@ -37,10 +44,11 @@ The implementation is organized into phases, with each phase broken down into sm
 
 ### Vertical Slice Priority & Stubbing Strategy
 
-To stay focused on validating core architecture quickly, we'll prioritize a complete vertical slice:
+To stay focused on validating core architecture quickly, we'll prioritize a complete vertical slice targeting TODO app complexity:
 
 1. **Minimal Viable Flow:** Prioritize one complete flow through all system layers:
    - Component creation → variable definition → simple graph with 2-3 node types → execution → preview display → persistence → collaboration
+   - Specifically focus on enabling a TODO list app as validation target
 
 2. **Features to Stub Initially:**
    - **Design Mode:** Start with a Structure Panel offering click-to-add elements and a simple property panel for basic CSS properties (instead of a full visual canvas)
@@ -138,11 +146,13 @@ This approach ensures we validate our core architectural assumptions quickly wit
 
 ### Phase 3 – Execution Engine & Component System
 
-- **3.1 Queue-Based Executor**
-  - Implement core execution queue
-  - Create snapshot mechanism for CRDT state during execution
-  - Build node evaluation system with input/output resolution
+- **3.1 Synchronous Execution Engine**
+  - Implement simple sequential execution model
+  - Build direct CRDT state access pattern
+  - Create basic node evaluation system with input/output resolution
+  - Focus on synchronous operations initially
   - Test execution with basic node types
+  - *(Defer)* Snapshot mechanism and advanced queue prioritization
 
 - **3.2 Variable System Implementation**
   - Develop variable definition and storage system
@@ -158,25 +168,25 @@ This approach ensures we validate our core architectural assumptions quickly wit
 
 ### Phase 4 – Collaboration & Functions
 
-- **4.1 WebSocket Sync Implementation**
-  - Set up basic WebSocket relay server
-  - Implement y-websocket provider integration
-  - Test multi-user editing scenarios
-  - Add connection status and diagnostics
+- **4.1 WebRTC Collaboration Implementation**
+  - Implement y-webrtc provider integration
+  - Use public signaling servers for initial connection establishment
+  - Test 2-user editing scenarios
+  - Add basic connection status indicators
 
 - **4.2 Awareness Protocol Integration**
-  - Implement presence indicators (cursors, selections)
-  - Create conflict resolution visualization
-  - Develop user identity and permissions system
+  - Implement simple presence indicators (cursors, avatars)
+  - Create basic conflict resolution UI if needed
   - Test collaboration edge cases
+  - *(Defer)* Advanced user identity and permissions system
 
 - **4.3 Function System Implementation**
   - Build function definition system
   - Implement function invocation through FunctionCallNode
   - Create function argument/return handling
-  - Test complex function compositions
+  - Test function composition with simple examples
 
-*Note: Testing should also incorporate fault injection for the sync layer (simulating network latency/drops) and visual regression testing for the React Flow rendering.*
+*Note: For initial implementation, focus on WebRTC-based collaboration which simplifies the infrastructure needed for 2-user scenarios.*
 
 ### Phase 5 – Visual Design Mode & Production Readiness
 
@@ -226,8 +236,8 @@ This approach ensures we validate our core architectural assumptions quickly wit
 - Phase 1.1 (Types) must be complete before deep work on other phases
 - Phase 1.3 (React Flow Integration) depends on successful Phase 0 spike
 - Phase 2.2 (Sync Layer) depends on Phase 1.2 & 1.3
-- Phase 3.1 (Executor) depends on stable Phase 2 implementation
-- Phase 4.1 (WebSocket Sync) requires solid Phase 2.3 local storage foundation
+- Phase 3.1 (Synchronous Execution Engine) depends on stable Phase 2 implementation
+- Phase 4.1 (WebRTC Collaboration) requires solid Phase 2.3 local storage foundation
 
 ## Risk Assessment & Mitigation
 
@@ -261,6 +271,49 @@ This approach ensures we validate our core architectural assumptions quickly wit
    - *Mitigation:* Focus on user capabilities over technical perfection
    - *Example:* Accepting "good enough" performance in early versions before extensive optimization
    - *Decision Gate:* Only optimize when a specific user experience issue is identified
+
+## Solo Development Considerations
+
+As this project is being implemented by a single developer with AI assistance, several practical considerations will help maintain progress and focus:
+
+### Time Boxing
+
+1. **Spike Investigations:** Limit technology explorations to 1-2 days maximum
+2. **Blocked Features:** When stuck on a feature, time-box to 4 hours before moving to another part
+3. **Technical Debt:** Allocate 10-20% of time to refactoring/cleanup to prevent accumulation
+
+### Progress Tracking
+
+1. **Daily Achievements:** Document at least one tangible outcome each development day
+2. **Weekly Demo:** Create a simple self-demo at the end of each week showing progress
+3. **Changelog:** Maintain a simple bullet-point log of completed functionality
+
+### Checkpoint Criteria
+
+For each milestone, consider it complete when:
+
+1. **Design Flow Working:** Can create a graph with 3+ node types and save its state
+2. **Basic State Management:** Can create a variable, set its value, and see it displayed
+3. **Interactive Component:** Button click visibly updates some displayed text
+4. **Component Composition:** Can create a component that uses another component
+5. **Persistence Functional:** Can close the app and reopen with work intact
+6. **Basic Collaboration:** Two browser windows can edit the same document with changes visible in both
+
+### External Testing
+
+1. **Self-Testing:** Use different devices/browsers to simulate different users
+2. **Recorded Sessions:** Create screen recordings to review your own usage patterns
+3. **Friend Feedback:** Schedule 2-3 short sessions with friends/colleagues after major milestones
+4. **Online Feedback:** Share screenshots/videos in relevant communities for quick feedback
+
+### Fallback Approaches
+
+1. **CRDT Complexity:** If Yjs proves too complex, fall back to a simpler shared state model with basic operational transforms
+2. **React Flow Integration:** If deep integration is problematic, consider a more loosely coupled approach
+3. **Execution Engine:** Start with a simpler sequential executor before adding advanced features
+4. **Collaboration Scale:** Begin with WebRTC for 2-user scenarios; only add WebSocket relay server if needed for larger scale collaboration
+
+This solo approach emphasizes pragmatic progress over perfection, with regular reality checks to ensure the project remains on track despite limited resources.
 
 ## Conclusion
 

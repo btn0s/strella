@@ -16,6 +16,18 @@
 **Type:** Engineering Blueprint  
 **Target:** Local-First VDE with Real-time Collaboration using React Flow
 
+## Initial Scope & Focus
+
+This specification targets an initial vertical slice implementation focused on TODO app complexity:
+
+- **User Capabilities:** Creating and editing simple interactive components (2-3 node types)
+- **Scale:** Supporting small graphs (10-20 nodes) initially
+- **Collaboration:** 2-user real-time editing via WebRTC
+- **UI Complexity:** Structure Panel with click-to-add elements and basic Property Panel
+- **Data Model:** Simplified CRDT structure focused on essential elements
+
+The implementation follows a progressive enhancement approach, starting with simpler versions of each system component and adding complexity only as needed to support user capabilities. This ensures rapid validation of core architectural assumptions without getting distracted by advanced features.
+
 ---
 
 ## 0. Guiding Principles
@@ -118,20 +130,48 @@ interface LayoutNode {
 
 ---
 
-## 5. Graph Execution Engine
+## 5. Graph Execution Engine (Simplified Initial Approach)
 
-*(Note: Graph structure (nodes, edges, data) managed by CRDTs. Execution reads from the CRDT snapshot at the time of execution.)*
+*(Note: Graph structure (nodes, edges, data) managed by CRDTs. Execution reads from the CRDT state.)*
 
-### Node Evaluation Lifecycle
+### Initial Synchronous Execution Model
 
-1. **Input resolution** (reading values from connected nodes/variables via CRDTs)
-2. **Node `evaluate()` call**
-3. **Output propagation** (potentially triggering CRDT updates if state is modified, e.g., SetVarNode)
-4. **Queue next node(s)**
+For the initial implementation focused on TODO app complexity, we'll use a simpler synchronous execution model:
 
-### Execution Context
+1. **Direct CRDT State Access** - Read values directly from the CRDT document rather than using snapshots
+2. **Sequential Evaluation** - Process nodes in a deterministic order using a simple queue
+3. **Synchronous Operations** - Focus on operations that complete immediately before moving to the next node
 
-- Must be provided with a *consistent snapshot* of relevant CRDT state (variables, props) for the duration of a single execution flow to avoid issues from concurrent remote changes during execution.
+```ts
+// Simple initial execution model
+function executeGraph(entryNodeId, yjsDoc) {
+  const visited = new Set();
+  const queue = [entryNodeId];
+  
+  while (queue.length > 0) {
+    const nodeId = queue.shift();
+    if (visited.has(nodeId)) continue;
+    visited.add(nodeId);
+    
+    const nodeData = getNodeFromYjs(yjsDoc, nodeId);
+    const outputs = evaluateNode(nodeData, yjsDoc);
+    
+    // Get outgoing edges and add target nodes to queue
+    const outgoingEdges = getOutgoingEdgesFromYjs(yjsDoc, nodeId);
+    for (const edge of outgoingEdges) {
+      queue.push(edge.target);
+    }
+  }
+}
+```
+
+### Future Advanced Execution Context
+
+As the application grows in complexity, the execution engine will evolve to include:
+
+- **Snapshot-based state** for consistent execution across concurrent edits
+- **Advanced queue with priority handling** for more complex control flows
+- **Asynchronous node operations** while maintaining execution integrity
 
 ```ts
 interface ExecutionContext {
@@ -143,7 +183,7 @@ interface ExecutionContext {
 }
 ```
 
-To ensure consistency during a single execution flow (triggered by an event or load), the engine should capture a snapshot of necessary inputs (relevant variable values from the `variablesSnapshot`, component props from `propsSnapshot`) *at the beginning* of the execution cycle by synchronously reading from the `crdtDoc`. Node evaluations use this initial snapshot for inputs. Mutations performed by nodes (e.g., `SetVarNode`) should directly update the `crdtDoc`, triggering the standard reactive flow. Race conditions are mitigated by using the initial snapshot for reads within the synchronous execution cycle. Long-running asynchronous operations within a node would need strategies to handle potential state changes occurring during their execution (e.g., re-querying state, cancellation, or designing nodes to be idempotent).
+This progressive approach ensures we can validate core concepts quickly with a simpler implementation before adding complexity for advanced use cases.
 
 ---
 
@@ -295,26 +335,58 @@ const initialDoc = new Y.Doc();
 
 ---
 
-## 14. NEW: Real-time Synchronization Architecture
+## 14. Real-time Synchronization Architecture (Revised)
 
-- **Client:** Uses a CRDT provider (e.g., `y-websocket`) to connect to the sync server.
-    - Sends local CRDT updates (generated automatically by Yjs on changes) to the server.
-    - Receives remote CRDT updates from the server and applies them to the local `Y.Doc`.
-    - Uses CRDT awareness protocol (e.g., `y-protocols/awareness`) for presence (cursors, selections).
-- **Backend Sync Server:**
-    - **Role:** Lightweight message relay and temporary update log.
-    - **Technology:** Node.js + `ws` library + `y-websocket-server` (or equivalent for chosen CRDT).
-    - **Functionality:**
-        - Manages WebSocket connections per project/document ID.
-        - Receives CRDT updates from one client.
-        - Broadcasts updates to all other clients connected to the same document.
-        - Persists recent CRDT *updates* temporarily (e.g., in memory or Redis) to allow newly connected/reconnected clients to efficiently fetch missed changes.
-        - Manages awareness data relay.
-    - **Does NOT hold the full project state.**
+- **Initial Approach (2-User Collaboration):**
+  - **Client:** Uses a CRDT provider (e.g., `y-webrtc`) for direct peer-to-peer collaboration.
+    - Supports small-scale collaboration (2-10 users) without a dedicated server.
+    - Uses default public signaling servers initially.
+    - Handles Yjs awareness protocol for presence indicators.
+    - Automatically manages reconnection and state synchronization.
+  
+  ```ts
+  // Simple WebRTC implementation example
+  import * as Y from 'yjs';
+  import { WebrtcProvider } from 'y-webrtc';
+  
+  const doc = new Y.Doc();
+  const webrtcProvider = new WebrtcProvider('strella-doc-id', doc, {
+    signaling: ['wss://signaling.yjs.dev']  // Default public signaling server
+  });
+  ```
+
+- **Future Scaling (WebSocket Server):**
+  - **Role:** Lightweight message relay and temporary update log.
+  - **Technology:** Node.js + `ws` library + `y-websocket-server` (or equivalent for chosen CRDT).
+  - **Functionality:**
+    - Manages WebSocket connections per project/document ID.
+    - Receives CRDT updates from one client.
+    - Broadcasts updates to all other clients connected to the same document.
+    - Persists recent CRDT *updates* temporarily to allow newly connected clients to efficiently fetch missed changes.
+    - Manages awareness data relay.
+  - **Does NOT hold the full project state.**
 
 ---
 
-## 15. CRDT Data Model Examples
+## 15. CRDT Data Model Examples (Simplified for Initial Implementation)
+
+For the initial implementation focused on TODO app complexity, we'll use a streamlined CRDT structure:
+
+```ts
+// Top level document
+const doc = new Y.Doc();
+
+// Components collection
+const components = doc.getMap('components');
+
+// Single component structure (simplified)
+const todoComponent = components.get('todo-list');
+const nodes = todoComponent.get('nodes'); // Y.Array
+const edges = todoComponent.get('edges'); // Y.Array
+const variables = todoComponent.get('variables'); // Y.Map
+```
+
+This simplified approach focuses on the essential structures needed for a working vertical slice. As the application evolves, we can extend to the more comprehensive model:
 
 - **Project Structure:** Top-level `Y.Doc`.
 - **Components:** `Y.Map<Y.Map<any>>` mapping component ID to component data.
@@ -324,12 +396,7 @@ const initialDoc = new Y.Doc();
 - **Variables:** `Y.Map<any>` for definitions, potentially another `Y.Map<any>` for shared runtime values.
 - **Text Content:** `Y.Text` for collaborative text editing within nodes (e.g., Text node content, code snippets).
 
-### Detailed Schema Examples (Conceptual)
-
-- **LayoutNode:** `Y.Map` containing keys like `id: string`, `type: string`, `props: Y.Map<any>`, `children: Y.Array<string>` (where strings are IDs of child LayoutNode maps).
-- **GraphNode:** `Y.Map` with `id: string`, `type: string`, `position: Y.Map<{x: number, y: number}>`, `data: Y.Map<any>` (node-specific config), maybe `inputHandles: Y.Map<any>`, `outputHandles: Y.Map<any>`.
-- **GraphEdge:** `Y.Map` with `id: string`, `sourceNodeId: string`, `sourceHandleId: string`, `targetNodeId: string`, `targetHandleId: string`.
-- Entity relationships (parent-child, edge-node) are primarily managed via storing unique IDs.
+This progressive implementation approach allows for quick validation of core concepts while maintaining the option to expand the CRDT model as complexity increases.
 
 ---
 
@@ -414,31 +481,33 @@ const initialDoc = new Y.Doc();
 
 ### Phase 4 – Collaboration & Functions
 
-- **4.1 WebSocket Sync Implementation**
-  - Set up basic WebSocket relay server
-  - Implement y-websocket provider integration
-  - Test multi-user editing scenarios
-  - Add connection status and diagnostics
+- **4.1 Initial P2P Collaboration (WebRTC)**
+  - Implement y-webrtc provider integration
+  - Use public signaling servers for connection establishment
+  - Test 2-user editing scenarios
+  - Add basic connection status indicators
 
 - **4.2 Awareness Protocol Integration**
-  - Implement presence indicators (cursors, selections)
-  - Create conflict resolution visualization
-  - Develop user identity and permissions system
-  - Test collaboration edge cases
+  - Implement simple presence indicators (cursors, selections)
+  - Create basic conflict visualization
+  - Test collaboration edge cases in P2P model
+  - *(Defer)* Advanced user identity and permissions system
 
 - **4.3 Function System Implementation**
   - Build function definition system
   - Implement function invocation through FunctionCallNode
   - Create function argument/return handling
-  - Test complex function composition
+  - Test complex function compositions
 
 ### Phase 5 – Visual Design Mode & Production Readiness
 
-- **5.1 Design Canvas Implementation**
-  - Create canvas-based layout editing
-  - Build drag-and-drop primitives system
-  - Implement snapping and alignment guides
-  - Develop selection and multi-select tools
+- **5.1 Design Canvas Implementation (Simplified for Vertical Slice)**
+  - Create Structure Panel with click-to-add element functionality
+  - Implement basic Property Panel for essential CSS properties (background, margin, padding, text)
+  - Add simple controls for numerical/text values and basic color selection
+  - *(Defer)* Canvas-based drag-and-drop interactions
+  - *(Defer)* Advanced snapping and alignment guides
+  - *(Defer)* Complex multi-select tools and operations
 
 - **5.2 Runtime vs. Authored View**
   - Build visualization for runtime-generated elements
@@ -465,7 +534,7 @@ const initialDoc = new Y.Doc();
 | Principle                         | System Behavior                                                                 |
 |----------------------------------|---------------------------------------------------------------------------------|
 | Local-First                      | App functions offline; local file (`.strella`) is the primary user data store.     |
-| Real-time Sync (Online)          | CRDT updates relayed via WebSocket server for seamless collaboration.            |
+| Real-time Sync (Online)          | CRDT updates shared via WebRTC (initially) or WebSocket for larger scale collaboration. |
 | CRDTs Manage State               | All shared project data (layout, graph, vars) resides in CRDT structures (Yjs). |
 | Graphs are entity-scoped         | Always belong to a component or function within the CRDT structure.              |
 | Layout is declarative (in CRDT)  | Declared layout is visible, stored in CRDTs.                                    |
@@ -473,3 +542,4 @@ const initialDoc = new Y.Doc();
 | URL reflects Navigation          | Used for component/mode selection, not granular collaborative state.            |
 | Variables are nameable + scoped  | Defined and accessed via CRDTs.                                                 |
 | Functions return data            | Cannot directly cause CRDT mutations outside their scope (unless via return value).|
+| Implementation Complexity        | Start simple (TODO app scale), add complexity only as needed for user capabilities. |

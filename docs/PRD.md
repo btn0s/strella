@@ -6,6 +6,19 @@
 
 Strella is the first IDE purpose-built for design engineers. It merges the visual structure of design tools with the logic and state management capabilities of programming environments. Components in Strella are authored visually, composed declaratively, and executed live via an embedded runtime—without requiring translation from design to code. Strella supports local-first, real-time collaboration, allowing multiple users to work on the same project simultaneously while ensuring data remains primarily stored on the user's machine.
 
+### Initial Implementation Focus
+
+The initial implementation will focus on a vertical slice approach, targeting TODO app complexity to validate core architectural concepts:
+- Build a working flow that enables creating simple interactive components
+- Support a minimal set of node types and basic state management
+- Implement a simplified Design Mode with Structure Panel and basic Property Panel
+- Enable 2-user real-time collaboration via WebRTC
+- Focus on validating user capabilities rather than technical completeness
+
+This focused approach ensures we can quickly validate the core experience before expanding to more complex scenarios.
+
+### Core Principles
+
 The core of Strella is its commitment to **three** complementary principles:
 
 ### Code-Like Authorability
@@ -266,44 +279,6 @@ The file includes data representing:
 - Functions
 - Composition metadata
 - CRDT metadata for synchronization state
-
----
-
-## Implementation Phases
-
-*(Note: Phases need significant revision to incorporate CRDTs/Sync early)*
-
-**Phase 1: Core Runtime & Collaboration Foundation**
-
-- CRDT-based data structures for core elements (Layout, Variables, basic Graph structure)
-- Local file persistence layer (saving/loading CRDT snapshots)
-- Basic real-time sync provider and lightweight backend relay
-- Initial Graph editor (React Flow) based on CRDTs
-- Basic queue-based executor interacting with CRDT state
-- Live preview runtime rendering from CRDTs
-
-**Phase 2: Interaction Layer & Enhanced Collaboration**
-
-- Event handling wired through CRDTs
-- Input + variable bindings (CRDT-driven)
-- State-driven reactivity (leveraging CRDT updates)
-- Presence indicators (cursors, selections - optional)
-
-**Phase 3: Composition, Functions & Robust Sync**
-
-- Nested component rendering (CRDT-aware)
-- Prop binding via CRDTs
-- Event propagation across components (CRDT-aware)
-- User-defined functions (stored in CRDTs)
-- Robust offline handling and sync recovery
-
-**Phase 4: Visual Design Mode & Polish**
-
-- Canvas layout editing manipulating CRDTs
-- Structure panel and bindings UI (reading/writing CRDTs)
-- Graph jump from events
-- Runtime-authoring split view
-- Devtools improvements
 
 ---
 
