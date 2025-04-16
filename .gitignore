@@ -4,3 +4,13 @@
 # React Router
 /.react-router/
 /build/
+
+.idea/
+
+.env
+.env.local
+.env.development
+.env.production
+.env.test
+.env.test.local
+.env.test.local

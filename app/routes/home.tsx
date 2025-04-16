@@ -1,5 +1,5 @@
 import type { Route } from "./+types/home";
-import { YjsReactFlowPOC } from "../components/editor/YjsReactFlowPOC";
+import { YjsReactFlowPOC } from "app/components/editor/yjs-reactflow-poc";
 
 export function meta({}: Route.MetaArgs) {
   return [

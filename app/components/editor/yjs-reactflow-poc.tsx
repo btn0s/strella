@@ -17,7 +17,7 @@ import type {
 import "@xyflow/react/dist/style.css";
 import * as Y from "yjs";
 import { WebrtcProvider } from "y-webrtc";
-import { CursorsLayer } from "./CursorsLayer";
+import { CursorsLayer } from "app/components/editor/cursors-layer";
 
 // Initial nodes for demo
 const initialNodes: Node[] = [

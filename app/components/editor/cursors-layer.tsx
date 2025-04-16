@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from "react";
 import { WebrtcProvider } from "y-webrtc";
-import { Cursor } from "./Cursor";
-import type { CursorData, UserInfo } from "./Cursor";
+import { Cursor } from "app/components/editor/cursor";
+import type { CursorData, UserInfo } from "app/components/editor/cursor";
 
 interface CursorsLayerProps {
   provider: WebrtcProvider | null;
-  containerRef: React.RefObject<HTMLDivElement>;
+  containerRef: React.RefObject<HTMLDivElement | null>;
 }
 
 interface AwarenessState {
@@ -50,7 +50,7 @@ export function CursorsLayer({ provider, containerRef }: CursorsLayerProps) {
   }, [provider]);
 
   useEffect(() => {
-    if (!provider || !containerRef.current) return;
+    if (!provider || !containerRef || !containerRef.current) return;
 
     // Generate a random user
     const user: UserInfo = {
