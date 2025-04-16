@@ -54,6 +54,10 @@ The implementation is organized into phases, with each phase broken down into sm
   - Test UI with potential users for intuitiveness and clarity
   - Define UI styling guidelines and component patterns
 
+- This phase should specifically define and validate the core interaction mechanics for the visual design mode, even if full implementation is later, to inform data model requirements.
+
+**Milestone:** 0.3 User Feedback Session on Core UX Prototypes
+
 ### Phase 1 – Foundational Type System & Core Models
 
 - **1.1 Core Type Definitions**
@@ -66,6 +70,7 @@ The implementation is organized into phases, with each phase broken down into sm
   - Implement minimal Yjs document structure
   - Create basic CRUD operations for Components, Nodes, Edges
   - Write tests for basic CRDT operations
+  - Develop unit tests for CRDT schema operations and merge scenarios.
   - Develop serialization/deserialization helpers for `.strella` files
 
 - **1.3 React Flow Integration POC**
@@ -74,12 +79,9 @@ The implementation is organized into phases, with each phase broken down into sm
   - Test bidirectional updates (Yjs → React Flow → Yjs)
   - Create sample custom node and edge types
   - Implement a vertical slice with one node type (e.g., SetVarNode) working end-to-end
-
-- **1.4 Development Tooling**
-  - Create CRDT inspection utilities
-  - Build graph validation tools
-  - Implement performance measurement framework
   - Develop simulation tools for testing collaboration scenarios
+
+*Note: Development tooling (CRDT inspection, sync visualization, collaboration simulation) is critical for debugging and efficiently developing subsequent phases. These tasks should be prioritized as key enablers.*
 
 ### Phase 2 – Interactive Primitives & Sync Foundation
 
@@ -92,6 +94,7 @@ The implementation is organized into phases, with each phase broken down into sm
 - **2.2 Sync Layer Development**
   - Implement complete `syncGraphFromYjs` with optimizations
   - Build all React Flow event handlers (`onNodesChange`, `onConnect`, etc.)
+  - Implement automated multi-client tests (e.g., using Playwright/Cypress drivers) to simulate concurrent editing and validate sync integrity.
   - Create provider component encapsulating sync logic
   - Develop proper error handling and recovery strategies
 
@@ -106,6 +109,8 @@ The implementation is organized into phases, with each phase broken down into sm
   - Implement debug views for CRDT operations
   - Build network condition simulator for testing edge cases
   - Create tools to inspect document history and conflicts
+
+**Milestone:** Conduct usability testing on core graph editing and execution flow.
 
 ### Phase 3 – Execution Engine & Component System
 
@@ -147,6 +152,8 @@ The implementation is organized into phases, with each phase broken down into sm
   - Create function argument/return handling
   - Test complex function compositions
 
+*Note: Testing should also incorporate fault injection for the sync layer (simulating network latency/drops) and visual regression testing for the React Flow rendering.*
+
 ### Phase 5 – Visual Design Mode & Production Readiness
 
 - **5.1 Design Canvas Implementation**
@@ -172,6 +179,8 @@ The implementation is organized into phases, with each phase broken down into sm
   - Build performance benchmarks
   - Test multi-user scenarios
   - Validate cross-platform behavior
+
+**Milestone:** Validate Design Mode interactions through user testing.
 
 ## Milestones & Dependencies
 
@@ -218,5 +227,7 @@ The implementation is organized into phases, with each phase broken down into sm
 ## Conclusion
 
 This implementation plan provides a tactical roadmap for building Strella incrementally, while validating core assumptions early. By focusing on foundational elements first and taking a vertical slice approach, we can build confidence in the architecture while showing visible progress throughout development.
+
+The later phases (e.g., Phase 4, 5) are currently defined at a higher level. As the project progresses and learnings emerge from earlier phases, these later phases will be broken down into more granular milestones and tasks.
 
 The plan should be treated as a living document and updated as learnings from each phase inform subsequent work. 

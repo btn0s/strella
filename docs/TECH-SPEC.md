@@ -43,7 +43,7 @@
     - **Desktop:** Direct file system access (via Electron/Tauri APIs) to load/save the project file snapshot.
     - **Mechanism:** Saving involves serializing the Yjs document state; loading involves deserializing it.
 - **Real-time Sync (Client):** **`y-websocket`** provider connecting to the sync server.
-- **Transient Local UI State:** Zustand (Optional, for non-shared state like ephemeral editor settings, tool focus, React Flow viewport state if not collaborative).
+- **Transient Local UI State:** Zustand (Optional). Used *strictly* for ephemeral, non-collaborative, non-persisted UI state specific to the local user session. Examples: visibility state of UI panels, current tool selection *if not collaborative*, local-only viewport state *if not managed by Yjs Awareness*. **All project data, component structure, graph logic, variables, and collaborative state MUST reside within the Yjs CRDT document.**
 
 ---
 
@@ -143,6 +143,8 @@ interface ExecutionContext {
 }
 ```
 
+To ensure consistency during a single execution flow (triggered by an event or load), the engine should capture a snapshot of necessary inputs (relevant variable values from the `variablesSnapshot`, component props from `propsSnapshot`) *at the beginning* of the execution cycle by synchronously reading from the `crdtDoc`. Node evaluations use this initial snapshot for inputs. Mutations performed by nodes (e.g., `SetVarNode`) should directly update the `crdtDoc`, triggering the standard reactive flow. Race conditions are mitigated by using the initial snapshot for reads within the synchronous execution cycle. Long-running asynchronous operations within a node would need strategies to handle potential state changes occurring during their execution (e.g., re-querying state, cancellation, or designing nodes to be idempotent).
+
 ---
 
 ## 6. Node and Port Schema
@@ -164,6 +166,8 @@ interface Node {
 
 - **React Flow Mapping:** The Yjs data for each node is mapped to the `data` prop of the corresponding React Flow `Node`. The `position` from Yjs directly maps to the React Flow `Node` position.
 - **Ports/Handles:** Custom React Flow node components (`nodeTypes`) will use the `<Handle>` component to render connection points based on the node's static type definition.
+
+Performance monitoring for the React Flow rendering, especially under heavy CRDT load (many nodes/edges or frequent updates), will be crucial. Optimization strategies such as node/edge virtualization (rendering only visible elements), debouncing/throttling state updates passed to React Flow, and optimizing the `useYjsReactFlowBridge` hook should be considered and benchmarked as the application scales.
 
 ---
 
@@ -238,6 +242,9 @@ interface FunctionDefinition {
 - **React Flow Viewport State:**
     - **Decision:** Viewport state (zoom, pan) will initially be **local** to each user (managed by React Flow internally or via Zustand if needed) to simplify initial implementation.
     - **Future:** Collaborative viewport syncing can be added later using the Yjs Awareness protocol if required.
+
+### Synchronization Error Handling & Recovery
+The client must handle sync provider errors gracefully. This includes: displaying connection status indicators (connecting, online, offline, error); implementing automatic reconnection attempts with backoff for transient network issues; using Yjs state vectors on reconnect to efficiently fetch only missing updates; potentially detecting persistent divergence (e.g., via checksums or versioning if necessary, though CRDTs aim to prevent this) and notifying the user, possibly suggesting a page reload or providing diagnostic information.
 
 ---
 
@@ -316,6 +323,13 @@ const initialDoc = new Y.Doc();
 - **Graph Nodes/Edges:** `Y.Map` containing `Y.Map<Y.Map<any>>` for nodes and `Y.Array<Y.Map<any>>` for edges.
 - **Variables:** `Y.Map<any>` for definitions, potentially another `Y.Map<any>` for shared runtime values.
 - **Text Content:** `Y.Text` for collaborative text editing within nodes (e.g., Text node content, code snippets).
+
+### Detailed Schema Examples (Conceptual)
+
+- **LayoutNode:** `Y.Map` containing keys like `id: string`, `type: string`, `props: Y.Map<any>`, `children: Y.Array<string>` (where strings are IDs of child LayoutNode maps).
+- **GraphNode:** `Y.Map` with `id: string`, `type: string`, `position: Y.Map<{x: number, y: number}>`, `data: Y.Map<any>` (node-specific config), maybe `inputHandles: Y.Map<any>`, `outputHandles: Y.Map<any>`.
+- **GraphEdge:** `Y.Map` with `id: string`, `sourceNodeId: string`, `sourceHandleId: string`, `targetNodeId: string`, `targetHandleId: string`.
+- Entity relationships (parent-child, edge-node) are primarily managed via storing unique IDs.
 
 ---
 

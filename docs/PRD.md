@@ -28,6 +28,8 @@ The core of Strella is its commitment to **three** complementary principles:
 - Changes are synchronized in real-time with collaborators when online using Conflict-free Replicated Data Types (CRDTs).
 - Users retain control over their project files.
 
+The collaborative experience aims to be seamless and intuitive. Users should ideally see collaborators' actions (like selections or node manipulation) in real-time via presence indicators (e.g., cursors, selection highlights). While CRDTs handle conflict resolution automatically, the system should strive to present a consistent and predictable view, minimizing user confusion even during rapid concurrent editing.
+
 Together, these principles establish Strella as a new kind of visual environment—one where structure, behavior, and state are unified and collaborative.
 
 ---
@@ -325,3 +327,8 @@ The file includes data representing:
 - No native app export initially
 - No code generation (initially)
 - No plugin system initially
+
+---
+
+## User Feedback and Error Handling
+Strella should provide clear and actionable feedback. Non-critical errors (e.g., temporary sync issues) should be communicated unobtrusively. Critical errors (e.g., corrupted file, persistent sync failure, invalid graph logic preventing execution) should be surfaced clearly, guiding the user towards resolution where possible (e.g., suggesting a reload, pointing to the problematic node). The system should prioritize data integrity and prevent user work loss.
