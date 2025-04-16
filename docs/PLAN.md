@@ -35,6 +35,30 @@ The implementation is organized into phases, with each phase broken down into sm
 7. **Progressive Enhancement:** Build single-user functionality first, then layer on collaboration features
 8. **Developer Tooling:** Invest in tools that speed up development of subsequent phases
 
+### Vertical Slice Priority & Stubbing Strategy
+
+To stay focused on validating core architecture quickly, we'll prioritize a complete vertical slice:
+
+1. **Minimal Viable Flow:** Prioritize one complete flow through all system layers:
+   - Component creation → variable definition → simple graph with 2-3 node types → execution → preview display → persistence → collaboration
+
+2. **Features to Stub Initially:**
+   - **Design Mode:** Start with a simple property panel instead of a full visual canvas
+   - **Collaboration UI:** Use simple presence indicators rather than sophisticated awareness features
+   - **Function System:** Begin with basic function definitions without complex typing or argument handling
+   - **Component Library:** Implement only 4-5 essential components needed for the vertical slice
+   - **Error Recovery:** Focus on error detection before building sophisticated recovery mechanisms
+   - **Node Types:** Implement a minimal set (5-7) of essential node types thoroughly
+
+3. **Critical Validations:**
+   - CRDT data model effectiveness
+   - React Flow integration performance
+   - Execution engine correctness
+   - Collaboration model usability
+   - Persistence reliability
+
+This approach ensures we validate our core architectural assumptions quickly without being distracted by complex but non-critical features.
+
 ## Implementation Phases
 
 ### Phase 0 – Initial Spike (End-to-End Validation)
@@ -78,10 +102,10 @@ The implementation is organized into phases, with each phase broken down into sm
   - Implement basic `useYjsReactFlowBridge` hook
   - Test bidirectional updates (Yjs → React Flow → Yjs)
   - Create sample custom node and edge types
-  - Implement a vertical slice with one node type (e.g., SetVarNode) working end-to-end
-  - Develop simulation tools for testing collaboration scenarios
+  - **Implement a vertical slice with one node type (e.g., SetVarNode) working end-to-end** (highest priority)
+  - Develop simple simulation tools for testing collaboration scenarios
 
-*Note: Development tooling (CRDT inspection, sync visualization, collaboration simulation) is critical for debugging and efficiently developing subsequent phases. These tasks should be prioritized as key enablers.*
+*Note: The vertical slice implementation in 1.3 is the highest priority deliverable of Phase 1, as it validates the entire architecture from CRDT storage through React Flow to execution and rendering. Development tooling should be minimal but sufficient for debugging core functionality.*
 
 ### Phase 2 – Interactive Primitives & Sync Foundation
 
@@ -156,31 +180,31 @@ The implementation is organized into phases, with each phase broken down into sm
 
 ### Phase 5 – Visual Design Mode & Production Readiness
 
-- **5.1 Design Canvas Implementation**
-  - Create canvas-based layout editing
-  - Build drag-and-drop primitives system
-  - Implement snapping and alignment guides
-  - Develop selection and multi-select tools
+- **5.1 Design Canvas Implementation** *(Can be initially simplified)*
+  - Create basic property panel for layout editing *(Phase 1 priority)*
+  - Build simplified drag-and-drop primitives system
+  - *(Defer)* Advanced snapping and alignment guides
+  - *(Defer)* Complex multi-select tools and operations
 
 - **5.2 Runtime vs. Authored View**
-  - Build visualization for runtime-generated elements
+  - Build basic visualization for runtime-generated elements *(Phase 2 priority)*
   - Create toggle between runtime and authored views
-  - Implement runtime inspection tools
-  - Develop state diffing visualization
+  - *(Defer)* Advanced runtime inspection tools
+  - *(Defer)* Sophisticated state diffing visualization
 
 - **5.3 Error Handling & Production Hardening**
-  - Implement comprehensive error boundaries
-  - Create error recovery strategies
-  - Build performance optimizations
-  - Develop telemetry and diagnostics
+  - Implement essential error boundaries *(Phase 2-3 priority)*
+  - Create basic error detection and manual recovery *(Phase 3 priority)*
+  - *(Defer)* Advanced automatic recovery strategies
+  - *(Defer)* Comprehensive telemetry and diagnostics
 
 - **5.4 Comprehensive Integration Testing**
-  - Create end-to-end test suite
-  - Build performance benchmarks
-  - Test multi-user scenarios
-  - Validate cross-platform behavior
+  - Create core end-to-end test suite for the vertical slice *(Phase 2-3 priority)*
+  - Build basic performance benchmarks for CRDT operations *(Phase 2 priority)*
+  - Test minimal multi-user scenarios *(Phase 3-4 priority)*
+  - *(Defer)* Exhaustive cross-platform validation
 
-**Milestone:** Validate Design Mode interactions through user testing.
+**Milestone:** Validate basic Design Mode interactions through user testing with simplified implementation.
 
 ## Milestones & Dependencies
 
@@ -188,12 +212,12 @@ The implementation is organized into phases, with each phase broken down into sm
 
 1. **Spike Complete** - Basic Yjs + React Flow integration validated
 2. **Types Defined** - Complete type system established
-3. **Single Node Vertical Slice** - One node type working end-to-end
+3. **Single Node Vertical Slice** - One node type working end-to-end (highest priority validation)
 4. **Basic Graph Editor** - Multiple node types with connections, persisted locally
 5. **Execution Engine** - Working graph execution
-6. **Collaboration Ready** - Multi-user editing with proper conflict resolution
-7. **MVP Release** - All core functionality with basic UX
-8. **Production Release** - Fully tested, optimized system
+6. **Collaboration Ready** - Multi-user editing with simple presence indicators
+7. **MVP Release** - Complete vertical slice with minimal viable features
+8. **Production Release** - Enhanced features on solid foundation
 
 ### Critical Path Dependencies
 
@@ -223,6 +247,11 @@ The implementation is organized into phases, with each phase broken down into sm
 
 2. **UX Complexity** - Risk of creating system too complex for end users
    - *Mitigation:* Early user testing, focus on intuitive interaction patterns
+
+3. **Feature Distractions** - Getting sidetracked by complex features before validating architecture
+   - *Mitigation:* Adhere to the defined vertical slice priorities and stubbing strategy
+   - *High-Risk Distractions:* Visual design canvas, advanced collaboration features, comprehensive developer tooling
+   - *Mitigation Approach:* For each feature, implement the simplest version that validates the core architecture
 
 ## Conclusion
 
