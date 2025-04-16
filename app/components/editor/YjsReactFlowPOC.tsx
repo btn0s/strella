@@ -17,6 +17,7 @@ import type {
 import "@xyflow/react/dist/style.css";
 import * as Y from "yjs";
 import { WebrtcProvider } from "y-webrtc";
+import { CursorsLayer } from "./CursorsLayer";
 
 // Initial nodes for demo
 const initialNodes: Node[] = [
@@ -44,6 +45,8 @@ export function YjsReactFlowPOC() {
   const [nodes, setNodes] = useState<Node[]>(initialNodes);
   const [edges, setEdges] = useState<Edge[]>(initialEdges);
   const [connectionCount, setConnectionCount] = useState(0);
+  // Explicitly type the ref to match what CursorsLayer expects
+  const reactFlowWrapperRef = useRef<HTMLDivElement>(null);
 
   // Use refs to store Yjs document and provider
   const ydocRef = useRef<Y.Doc | null>(null);
@@ -228,7 +231,7 @@ export function YjsReactFlowPOC() {
           </button>
         </div>
       </div>
-      <div className="flex-grow">
+      <div className="flex-grow relative" ref={reactFlowWrapperRef}>
         <ReactFlow
           nodes={nodes}
           edges={edges}
@@ -240,6 +243,10 @@ export function YjsReactFlowPOC() {
           <Background />
           <Controls />
         </ReactFlow>
+        <CursorsLayer
+          provider={providerRef.current}
+          containerRef={reactFlowWrapperRef}
+        />
       </div>
       <div className="p-4 bg-slate-100 text-sm">
         <p>
@@ -250,6 +257,7 @@ export function YjsReactFlowPOC() {
           Try moving nodes, connecting them, or adding new nodes to see changes
           sync in real-time.
         </p>
+        <p>You can now also see other users' cursors in real-time!</p>
       </div>
     </div>
   );
