@@ -1,12 +1,12 @@
 # Strella System Specification  
-**Version:** 0.7  
+**Version:** 0.8  
 **Product Type:** Visual Development Environment (VDE)
 
 ## Overview
 
-Strella is the first IDE purpose-built for design engineers. It merges the visual structure of design tools with the logic and state management capabilities of programming environments. Components in Strella are authored visually, composed declaratively, and executed live via an embedded runtime—without requiring translation from design to code.
+Strella is the first IDE purpose-built for design engineers. It merges the visual structure of design tools with the logic and state management capabilities of programming environments. Components in Strella are authored visually, composed declaratively, and executed live via an embedded runtime—without requiring translation from design to code. Strella supports local-first, real-time collaboration, allowing multiple users to work on the same project simultaneously while ensuring data remains primarily stored on the user's machine.
 
-The core of Strella is its commitment to two complementary principles:
+The core of Strella is its commitment to **three** complementary principles:
 
 ### Code-Like Authorability
 
@@ -22,13 +22,19 @@ The core of Strella is its commitment to two complementary principles:
 - Preview updates instantly reflect all structural, logic, and data changes.
 - Strella encourages expressive experimentation without sacrificing engineering rigor.
 
-Together, these principles establish Strella as a new kind of visual environment—one where structure, behavior, and state are unified.
+### Local-First Real-time Collaboration
+
+- The primary source of truth resides on the user's local machine, ensuring offline functionality.
+- Changes are synchronized in real-time with collaborators when online using Conflict-free Replicated Data Types (CRDTs).
+- Users retain control over their project files.
+
+Together, these principles establish Strella as a new kind of visual environment—one where structure, behavior, and state are unified and collaborative.
 
 ---
 
 ## Project and Component Structure
 
-A Strella project is a single-page React application powered by Strella’s runtime and editor environment. Projects are made up of one or more components.
+A Strella project is a single-page React application powered by Strella's runtime and editor environment. Projects are made up of one or more components.
 
 Each component is a self-contained unit that defines:
 
@@ -38,7 +44,7 @@ Each component is a self-contained unit that defines:
 - A set of **functions**: reusable logic returning data
 - A **preview panel**: live runtime rendering of the component output
 
-Graphs are not standalone artifacts. They are always scoped to a component or a function. Strella’s editing environment reflects this: users don’t edit graphs generically—they edit the logic inside an entity.
+Graphs are not standalone artifacts. They are always scoped to a component or a function. Strella's editing environment reflects this: users don't edit graphs generically—they edit the logic inside an entity.
 
 Components return **UI**. Functions return **data**. This distinction matches the mental model from React and is maintained consistently in both behavior and authoring tools.
 
@@ -59,7 +65,7 @@ Layout nodes declared via the design canvas or structure panel are always visibl
 
 Layout nodes created imperatively via logic (e.g., from a `SpawnUIElementNode`) are **not shown in the authored structure panel**. They are rendered only at runtime (e.g., in the preview) and shown with a **distinct treatment**, such as a dimmed or ghosted visual.
 
-This distinction preserves a clear mental boundary between design-time structure and runtime expression—just like in code, where conditionally rendered elements don’t appear in the static tree.
+This distinction preserves a clear mental boundary between design-time structure and runtime expression—just like in code, where conditionally rendered elements don't appear in the static tree.
 
 ### Supported Layout Primitives
 
@@ -74,7 +80,7 @@ Custom components can also be instantiated in the layout tree or via logic, and 
 
 ## Variable System
 
-Variables in Strella are declared explicitly, and are always visible in the component’s variable panel. They can be created via:
+Variables in Strella are declared explicitly, and are always visible in the component's variable panel. They can be created via:
 
 - The "+" button in the variable sidebar
 - A shortcut in the graph view (drag from a port → "store as variable")
@@ -165,7 +171,7 @@ Props are passed from parent to child via bound values—either static, variable
 
 Child components can emit events using `EmitEventNode`, which are captured in the parent graph via `EventTriggerNode`. This creates a clean and declarative flow of interaction across nested components.
 
-Opportunity: In the future, consider adding support for named layout “slots” to enable advanced compositional patterns similar to React’s `children` and named props. Not needed now, but it will matter as users define deeply reusable UI pieces.
+Opportunity: In the future, consider adding support for named layout "slots" to enable advanced compositional patterns similar to React's `children` and named props. Not needed now, but it will matter as users define deeply reusable UI pieces.
 
 ---
 
@@ -212,7 +218,7 @@ The layout editor is a canvas-based interface for direct manipulation of UI stru
 - Quick binding UI for variables and logic outputs
 - Click-to-jump to graph logic for event handling
 
-Design mode edits the persistent layout tree. Runtime-generated elements do not appear here, but may be inspectable during preview via a parallel “render tree” panel.
+Design mode edits the persistent layout tree. Runtime-generated elements do not appear here, but may be inspectable during preview via a parallel "render tree" panel.
 
 ---
 
@@ -232,54 +238,70 @@ This system allows for fast modeling of business objects or domain-specific work
 
 ## Serialization
 
-All project data is serialized into a single JSON object for export or persistence:
+The project's state, managed internally using Conflict-free Replicated Data Types (CRDTs) to enable real-time collaboration and conflict resolution, is serialized into a single project file (e.g., `.strella` format, likely JSON or an optimized binary format) for local persistence and user control. This file represents a snapshot of the collaborative state.
+
+Loading involves deserializing this file back into the in-memory CRDT structures. The local file remains the primary source of truth, enabling full offline access.
 
 ```ts
-type ProjectFile = {
-  version: string
-  components: Component[]
+// Represents the structure *after* loading the file into memory
+type ProjectCRDTStructure = {
+  // ... CRDT representations of components, layout, graph, etc.
+}
+
+// Example File Structure (Conceptual Snapshot)
+type ProjectFileSnapshot = {
+  version: string;
+  // Data representing the CRDT snapshot
+  snapshotData: any; // Could be binary or structured (e.g., JSON)
 }
 ```
 
-The file includes:
+The file includes data representing:
 
 - Layout trees
 - Variable declarations
 - Logic graphs
 - Functions
 - Composition metadata
+- CRDT metadata for synchronization state
 
 ---
 
 ## Implementation Phases
 
-**Phase 1: Core MVP**
+*(Note: Phases need significant revision to incorporate CRDTs/Sync early)*
 
-- Layout tree
-- Variable system
-- Graph editor (React Flow)
-- Queue-based executor
-- Live preview runtime
+**Phase 1: Core Runtime & Collaboration Foundation**
 
-**Phase 2: Interaction Layer**
+- CRDT-based data structures for core elements (Layout, Variables, basic Graph structure)
+- Local file persistence layer (saving/loading CRDT snapshots)
+- Basic real-time sync provider and lightweight backend relay
+- Initial Graph editor (React Flow) based on CRDTs
+- Basic queue-based executor interacting with CRDT state
+- Live preview runtime rendering from CRDTs
 
-- Event handling
-- Input + variable bindings
-- State-driven reactivity
+**Phase 2: Interaction Layer & Enhanced Collaboration**
 
-**Phase 3: Composition and Functions**
+- Event handling wired through CRDTs
+- Input + variable bindings (CRDT-driven)
+- State-driven reactivity (leveraging CRDT updates)
+- Presence indicators (cursors, selections - optional)
 
-- Nested component rendering
-- Prop binding
-- Event propagation
-- User-defined functions
+**Phase 3: Composition, Functions & Robust Sync**
 
-**Phase 4: Visual Design Mode**
+- Nested component rendering (CRDT-aware)
+- Prop binding via CRDTs
+- Event propagation across components (CRDT-aware)
+- User-defined functions (stored in CRDTs)
+- Robust offline handling and sync recovery
 
-- Canvas layout editing
-- Structure panel and bindings UI
+**Phase 4: Visual Design Mode & Polish**
+
+- Canvas layout editing manipulating CRDTs
+- Structure panel and bindings UI (reading/writing CRDTs)
 - Graph jump from events
 - Runtime-authoring split view
+- Devtools improvements
 
 ---
 
@@ -289,7 +311,7 @@ The file includes:
 
 2. **Runtime structure is not design-time structure**. Layout created via logic does not appear in the structure panel. It exists only in preview, visually differentiated.
 
-3. **Functions return data. Components return UI.** This mirrors React’s model and is preserved in authoring, naming, and tooling.
+3. **Functions return data. Components return UI.** This mirrors React's model and is preserved in authoring, naming, and tooling.
 
 4. **Everything declarable is visible and nameable**. Variables and layout nodes are always inspectable. Runtime values are intentionally ephemeral.
 
@@ -297,10 +319,9 @@ The file includes:
 
 ## Non-Goals
 
-- No lifecycle modeling (`useEffect`, `onDestroy`)
+- No lifecycle modeling (`useEffect`, `onDestroy`) initially
 - No server-side rendering
-- No backend integration in MVP
-- No native app export
+- No complex backend logic beyond real-time synchronization relay
+- No native app export initially
 - No code generation (initially)
-- No plugin system
-- No multi-user collaboration
+- No plugin system initially
