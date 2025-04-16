@@ -337,40 +337,112 @@ const initialDoc = new Y.Doc();
 
 ---
 
-## 18. Implementation Phases (Revised for Local-First Real-time + React Flow)
+## 18. Implementation Phases (Tactical, Iterative Approach)
 
-### Phase 1 – Core CRDT Runtime & Persistence
-- Setup Yjs (or chosen CRDT lib).
-- Define core CRDT structures (Components, Layout, Variables, basic Graph with nodes/edges).
-- Implement local file persistence (load/save CRDT snapshot).
-- Setup basic `<ReactFlow>` instance.
-- Minimal renderer for Layout Tree from CRDTs.
+### Phase 1 – Foundational Type System & Core Models
+- **1.1 Core Type Definitions**
+  - Define TypeScript types for Component, Graph, Node, Edge interfaces
+  - Define Yjs CRDT schema mapping (how our domain models map to Y.Doc, Y.Map, Y.Array)
+  - Define React Flow adapter type interfaces
+  - Create type guards and validation utilities
 
-### Phase 2 – Yjs <-> React Flow Sync & Basic Editing
-- **Implement the core Yjs <-> React Flow adapter layer:**
-    - Build `syncGraphFromYjs` hook to observe Yjs and update React Flow `nodes`/`edges` state.
-    - Implement `applyReactFlowChangesToYjs` handlers for `onNodesChange` (position), `onConnect`, `onNodesDelete`, `onEdgesDelete`.
-- Create initial custom `nodeTypes` and `edgeTypes` reading basic data from CRDTs.
-- Implement basic editing operations via CRDT updates (add/remove nodes via UI).
-- Setup `y-websocket` provider & minimal `y-websocket-server`.
-- Verify basic real-time sync of node positions and connections.
-- Basic queue-based executor reading CRDT state.
+- **1.2 CRDT Storage POC**
+  - Implement minimal Yjs document structure
+  - Create basic CRUD operations for Components, Nodes, Edges
+  - Write tests for basic CRDT operations
+  - Develop serialization/deserialization helpers for `.strella` files
 
-### Phase 3 – Graph Logic, Events & Collaboration Features
-- Wire up Graph execution engine to modify CRDT state (e.g., `SetVarNode`).
-- Implement event handling triggering graph execution.
-- Implement Yjs Awareness protocol for presence (cursors, selections).
-- Enhance custom nodes to allow editing node `data` (e.g., labels) via Yjs updates.
-- Component instantiation/reuse via CRDTs.
-- Function authoring/execution via CRDTs.
+- **1.3 React Flow Integration POC**
+  - Create minimal mapping layer between Yjs and React Flow
+  - Implement basic `useYjsReactFlowBridge` hook
+  - Test bidirectional updates (Yjs → React Flow → Yjs)
+  - Create sample custom node and edge types
 
-### Phase 4 – Visual Design Mode & Robustness
-- Build visual design canvas interacting with Layout CRDTs.
-- Prop editor binding to CRDTs.
-- Structure tree view reflecting CRDTs.
-- Enhance sync robustness (error handling, reconnection logic).
-- Refine offline handling and merge behavior testing.
-- Devtools integration.
+### Phase 2 – Interactive Primitives & Sync Foundation
+
+- **2.1 Custom Node Development**
+  - Define standard node interface with `<Handle>` components
+  - Implement core node types (GetVarNode, SetVarNode, EntryNode, etc.)
+  - Build node type registry and factory
+  - Create styling system for nodes and handles
+
+- **2.2 Sync Layer Development**
+  - Implement complete `syncGraphFromYjs` with optimizations
+  - Build all React Flow event handlers (`onNodesChange`, `onConnect`, etc.)
+  - Create provider component encapsulating sync logic
+  - Develop proper error handling and recovery strategies
+
+- **2.3 Local Storage & File System POC**
+  - Build persistence layer for Yjs documents (browser localStorage/IndexedDB)
+  - Create file saving/loading utilities
+  - Test offline editing and state recovery
+  - Develop schema versioning/migration strategy
+
+### Phase 3 – Execution Engine & Component System
+
+- **3.1 Queue-Based Executor**
+  - Implement core execution queue
+  - Create snapshot mechanism for CRDT state during execution
+  - Build node evaluation system with input/output resolution
+  - Test execution with basic node types
+
+- **3.2 Variable System Implementation**
+  - Develop variable definition and storage system
+  - Implement binding mechanism for UI props
+  - Create variable panel UI components
+  - Build reactive updates between variables and UI
+
+- **3.3 Multi-Component System**
+  - Implement component navigation and loading
+  - Create component instantiation mechanism
+  - Develop prop passing between components
+  - Build event propagation system
+
+### Phase 4 – Collaboration & Functions
+
+- **4.1 WebSocket Sync Implementation**
+  - Set up basic WebSocket relay server
+  - Implement y-websocket provider integration
+  - Test multi-user editing scenarios
+  - Add connection status and diagnostics
+
+- **4.2 Awareness Protocol Integration**
+  - Implement presence indicators (cursors, selections)
+  - Create conflict resolution visualization
+  - Develop user identity and permissions system
+  - Test collaboration edge cases
+
+- **4.3 Function System Implementation**
+  - Build function definition system
+  - Implement function invocation through FunctionCallNode
+  - Create function argument/return handling
+  - Test complex function composition
+
+### Phase 5 – Visual Design Mode & Production Readiness
+
+- **5.1 Design Canvas Implementation**
+  - Create canvas-based layout editing
+  - Build drag-and-drop primitives system
+  - Implement snapping and alignment guides
+  - Develop selection and multi-select tools
+
+- **5.2 Runtime vs. Authored View**
+  - Build visualization for runtime-generated elements
+  - Create toggle between runtime and authored views
+  - Implement runtime inspection tools
+  - Develop state diffing visualization
+
+- **5.3 Error Handling & Production Hardening**
+  - Implement comprehensive error boundaries
+  - Create error recovery strategies
+  - Build performance optimizations
+  - Develop telemetry and diagnostics
+
+- **5.4 Comprehensive Integration Testing**
+  - Create end-to-end test suite
+  - Build performance benchmarks
+  - Test multi-user scenarios
+  - Validate cross-platform behavior
 
 ---
 
