@@ -1,13 +1,16 @@
 import type { Route } from "./+types/home";
-import { Welcome } from "../welcome/welcome";
+import { YjsReactFlowPOC } from "../components/editor/YjsReactFlowPOC";
 
 export function meta({}: Route.MetaArgs) {
   return [
-    { title: "New React Router App" },
-    { name: "description", content: "Welcome to React Router!" },
+    { title: "Strella POC" },
+    {
+      name: "description",
+      content: "Strella: Visual Development Environment POC",
+    },
   ];
 }
 
 export default function Home() {
-  return <Welcome />;
+  return <YjsReactFlowPOC />;
 }
