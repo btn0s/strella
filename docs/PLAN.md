@@ -43,7 +43,7 @@ To stay focused on validating core architecture quickly, we'll prioritize a comp
    - Component creation → variable definition → simple graph with 2-3 node types → execution → preview display → persistence → collaboration
 
 2. **Features to Stub Initially:**
-   - **Design Mode:** Start with a simple property panel instead of a full visual canvas
+   - **Design Mode:** Start with a Structure Panel offering click-to-add elements and a simple property panel for basic CSS properties (instead of a full visual canvas)
    - **Collaboration UI:** Use simple presence indicators rather than sophisticated awareness features
    - **Function System:** Begin with basic function definitions without complex typing or argument handling
    - **Component Library:** Implement only 4-5 essential components needed for the vertical slice
@@ -180,9 +180,11 @@ This approach ensures we validate our core architectural assumptions quickly wit
 
 ### Phase 5 – Visual Design Mode & Production Readiness
 
-- **5.1 Design Canvas Implementation** *(Can be initially simplified)*
-  - Create basic property panel for layout editing *(Phase 1 priority)*
-  - Build simplified drag-and-drop primitives system
+- **5.1 Design Canvas Implementation** *(Simplified for Vertical Slice)*
+  - Create Structure Panel with click-to-add element functionality *(Phase 1 priority)*
+  - Implement basic Property Panel for essential CSS properties (background, margin, padding, text) *(Phase 1-2 priority)*
+  - Add simple controls for numerical/text values and basic color selection
+  - *(Defer)* Canvas-based drag-and-drop interactions
   - *(Defer)* Advanced snapping and alignment guides
   - *(Defer)* Complex multi-select tools and operations
 
@@ -244,13 +246,15 @@ This approach ensures we validate our core architectural assumptions quickly wit
 
 1. **Scope Creep** - Tendency to add features before core is solid
    - *Mitigation:* Strict adherence to phased approach, clear MVP definition
+   - *Example:* Simplifying Design Mode to Structure Panel + basic properties instead of building full canvas system
 
 2. **UX Complexity** - Risk of creating system too complex for end users
    - *Mitigation:* Early user testing, focus on intuitive interaction patterns
+   - *Example:* Starting with click-to-add element approach before complex drag-and-drop interactions
 
 3. **Feature Distractions** - Getting sidetracked by complex features before validating architecture
    - *Mitigation:* Adhere to the defined vertical slice priorities and stubbing strategy
-   - *High-Risk Distractions:* Visual design canvas, advanced collaboration features, comprehensive developer tooling
+   - *High-Risk Distractions:* Full canvas-based design tools, advanced collaboration features, comprehensive developer tooling
    - *Mitigation Approach:* For each feature, implement the simplest version that validates the core architecture
 
 ## Conclusion
